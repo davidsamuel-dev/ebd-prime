@@ -1,0 +1,30 @@
+# MySQL local para EBD Prime — não depende da Hostinger.
+# Uso: na raiz do projeto → docker compose up -d
+# Depois copie backend/.env.example para backend/.env e use o bloco «Docker» lá descrito.
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ebd-prime-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-ebd_root_local}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-ebd_prime}
+      MYSQL_USER: ${MYSQL_USER:-ebd}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ebd_local}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - ebd_mysql_data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+volumes:
+  ebd_mysql_data:

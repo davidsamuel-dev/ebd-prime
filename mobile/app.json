@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "EBD Prime",
+    "slug": "ebd-prime",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/logo_fundo_azul.png",
+    "scheme": "ebdprime",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/logo_fundo_azul.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0078D4"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.adparaiso.ebdprime",
+      "versionCode": 1,
+      "softwareKeyboardLayoutMode": "resize",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/logo_fundo_azul.png",
+        "backgroundColor": "#0078D4"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/logo_fundo_azul.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-secure-store",
+      "@react-native-community/datetimepicker",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/logo_fundo_azul.png",
+          "color": "#0078D4",
+          "defaultChannel": "default"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

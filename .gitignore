@@ -1,0 +1,69 @@
+# =============================================================================
+# EBD Prime — ficheiros que NUNCA devem ir para o GitHub
+# =============================================================================
+
+# --- Segredos e ambiente (apenas .example pode ser versionado) ---
+backend/.env
+backend/.env.production
+backend/.env.deploy
+backend/.env.local
+backend/.env.*.local
+mobile/.env
+mobile/.env.local
+mobile/.env.*.local
+
+# Chaves e certificados
+*.pem
+*.key
+*.p12
+*.jks
+*.p8
+*.mobileprovision
+*service-account*.json
+firebase-service-account.json
+service-account.json
+
+# --- Dependências ---
+node_modules/
+mobile/node_modules/
+backend/vendor/
+
+# --- Builds, deploy e artefactos gerados ---
+deploy/
+mobile/.expo/
+mobile/dist/
+mobile/web-build/
+mobile/android/
+mobile/ios/
+mobile/.kotlin/
+*.tsbuildinfo
+*.apk
+*.aab
+*.ipa
+
+# --- Dumps de base de dados (produção / conta Hostinger) ---
+u370088447_*.sql
+*_production_dump.sql
+*.sql.backup
+
+# --- Logs e debug ---
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+firebase-debug.log
+*-debug.log
+.metro-health-check*
+
+# --- IDE, OS e ferramentas locais ---
+.cursor/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# --- Firebase (legado) ---
+.firebase/

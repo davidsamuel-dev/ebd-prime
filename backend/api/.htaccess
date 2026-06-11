@@ -1,0 +1,2 @@
+# Apache (ex.: Hostinger): evita listagem do diretório `api/`.
+Options -Indexes

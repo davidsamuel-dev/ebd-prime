@@ -1,0 +1,12 @@
+{
+  "name": "ebd-prime/backend",
+  "description": "API PHP — PHPMailer para recuperação de senha",
+  "require": {
+    "php": ">=8.0",
+    "phpmailer/phpmailer": "^6.9"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  }
+}

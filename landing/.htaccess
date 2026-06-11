@@ -1,0 +1,11 @@
+# Landing na raiz — a API em /api/ permanece independente (ficheiros PHP directos).
+DirectoryIndex index.html index.php
+Options -Indexes
+
+# Não reescrever pedidos a ficheiros ou pastas que existem (api/, lib/, site-assets/, etc.).
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+</IfModule>

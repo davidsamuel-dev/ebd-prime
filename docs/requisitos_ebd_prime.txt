@@ -1,0 +1,383 @@
+================================================================================
+  EBD PRIME — DOCUMENTO DE REQUISITOS (CONSOLIDADO) — ANEXO TÉCNICO
+  Especificação oficial (modelo IFTO): docs/DOCUMENTO_ESPECIFICACAO_EBD_PRIME.md
+  Versão do documento: 1.1  |  Referência: alinhamento pós-reunião 29/04 (pedido)
+  Âmbito: repositório actual (mobile Expo + backend PHP + Firebase/Firestore)
+  Numeração: RF001… (funcionais), RNF001… (não funcionais), RN001… (regras de
+  negócio) — identificadores únicos, sem repetição (modelo tipo documentacao).
+  Leitores não técnicos: ver docs/requisitos_ebd_prime_publico.txt (mesmo
+  conteúdo em linguagem simples, sem códigos de programação).
+================================================================================
+
+Este ficheiro substitui e reorganiza o levantamento disperso em
+`docs/documentacao_ebd_prime.md`, cruzando com o código real (pastas `mobile/`,
+`backend/`, `firestore.rules`) e com `docs/api_rest_ebd_prime.md`. Cada requisito
+indica o estado: [IMPL] [PARCIAL] [MOCK] [FUTURO].
+
+
+--------------------------------------------------------------------------------
+0. SUMÁRIO
+--------------------------------------------------------------------------------
+  0.1 Objectivo do produto
+  0.2 Stakeholders e perfis de utilizador
+  0.3 Arquitectura actual (implementada)
+  0.4 Etiquetas de estado
+
+
+--------------------------------------------------------------------------------
+0.1 Objectivo do produto
+--------------------------------------------------------------------------------
+Aplicação móvel (React Native / Expo) para gestão da Escola Bíblica Dominical
+(EBD): cadastro de congregação, turmas, alunos e professores; escala de aulas;
+sessão de aula com frequência, materiais (Bíblia/revista), visitantes, oferta e
+relatório; resumos por turma; histórico e aniversariantes; área "Geral" com
+painel após primeira aula concluída; autenticação via API PHP+MySQL OU
+Firebase (Firestore + Authentication), incluindo onboarding de nova escola e
+recuperação de senha (REST ou e-mail Firebase).
+
+
+--------------------------------------------------------------------------------
+0.2 Stakeholders e perfis de utilizador
+--------------------------------------------------------------------------------
+[IMPL] Administrador da escola (onboarding Firebase ou fluxo demo).
+[IMPL] Utilizador autenticado com `nivel_acesso` (ex.: admin, professor, …) e
+       `congregacao_id` no contexto da sessão (`mobile/context/AuthContext.tsx`).
+[IMPL] Modo demonstração sem backend (`authMode: demo`).
+[FUTURO] Secretário dedicado, níveis hierárquicos "campo" vs "filial" com regras
+         de visibilidade completas (ver RN legado na secção 6).
+
+
+--------------------------------------------------------------------------------
+0.3 Arquitectura actual (implementada)
+--------------------------------------------------------------------------------
+[IMPL] Cliente único em `mobile/` (Expo Router, TypeScript).
+[IMPL] Camada de dados abstracta em `mobile/lib/api.ts`:
+       - Se `getActiveDataBackend() === 'firebase'` → delega em
+         `mobile/lib/firebase-backend.ts` (Firestore + Auth SDK).
+       - Senão → HTTP JSON para `EXPO_PUBLIC_API_URL` (PHP em `backend/api/`).
+[IMPL] Backend PHP 8 + PDO + MySQL (`backend/`), OpenAPI em
+       `backend/openapi.yaml` (referência).
+[IMPL] Regras Firestore em `firestore.rules` (raiz do repositório).
+[PARCIAL] Pasta `/web` espelhada do mobile — NÃO existe neste repositório; só
+          mobile + backend + docs.
+
+
+--------------------------------------------------------------------------------
+0.4 Etiquetas de estado
+--------------------------------------------------------------------------------
+[IMPL]     Comportamento presente e utilizável no fluxo normal.
+[PARCIAL]  Estrutura ou UI existe; lógica, dados ou segurança incompletos.
+[MOCK]     Dados fictícios ou placeholders para UI / demonstração.
+[FUTURO]   Previsto na documentação legada ou gap evidente; não implementado.
+
+
+================================================================================
+1. REQUISITOS FUNCIONAIS (RF001 … RF050)
+   Inventário por módulo — cada ID ocorre uma única vez neste documento.
+================================================================================
+
+1.1 Autenticação, sessão e recuperação de senha
+--------------------------------------------------------------------------------
+RF001  [IMPL] Ecrã de login (`mobile/app/login.tsx`): utilizador e senha; estado
+       de saúde do servidor opcional; WhatsApp (URL fixa); atalhos Esqueci senha,
+       cadastro nova escola, Ajuda (alert).
+RF002  [IMPL] Recuperação de senha (`mobile/app/esqueci-senha/index.tsx`):
+       identificar conta; confirmar e-mail; envio conforme backend; confirmação;
+       layout com teclado (`KeyboardAdaptiveHero` com `collapseLayout`, textos
+       compactos). Ver RNF008.
+RF003  [IMPL] Backend REST: `POST backend/api/auth/forgot-lookup.php`,
+       `POST backend/api/auth/forgot-send.php`, `reset-form.php`,
+       `reset-password.php` (ver `docs/api_rest_ebd_prime.md`).
+RF004  [IMPL] Backend Firebase: `fbApiForgotLookup`, `fbApiForgotSend` em
+       `firebase-backend.ts` — Firestore resolve utilizador → e-mail;
+       `fetchSignInMethodsForEmail` + `sendPasswordResetEmail`; URL opcional
+       `EXPO_PUBLIC_FIREBASE_PASSWORD_RESET_CONTINUE_URL`.
+RF005  [IMPL] Logout: `apiLogout` (Firebase `signOut`; REST se existir).
+RF006  [IMPL] Token: `mobile/lib/auth-storage.ts` (SecureStore) nas chamadas
+       autenticadas em `api.ts`.
+
+
+1.2 Onboarding — cadastro de nova escola (admin)
+--------------------------------------------------------------------------------
+RF007  [IMPL] Fluxo multi-passo (`mobile/app/cadastro-escola/index.tsx`):
+       termos → telefone/SMS → verificação → dados pessoais → credenciais →
+       instituição → conclusão.
+RF008  [PARCIAL] SMS real: no Firebase backend os SMS são stub (código dev); com
+       API PHP usa `onboarding/sms-request.php` e `sms-verify.php`.
+RF009  [IMPL] Registo Firebase: `fbApiOnboardingRegister` cria utilizador Auth +
+       `congregacoes` e `usuarios` com contadores `_meta`.
+
+
+1.3 Portal principal (tabs) e navegação
+--------------------------------------------------------------------------------
+RF010  [IMPL] Tabs custom (`mobile/app/(tabs)/_layout.tsx`): Início + Geral;
+       carrossel Início/Turmas/Cadastros (`MainSwipeHub.tsx`).
+RF011  [IMPL] Menu drawer no Portal Geral (`PortalDrawerMenu.tsx`): partilhar,
+       redes (placeholder), política/privacidade (alert), termos, sair.
+RF012  [IMPL] Stack global (`mobile/app/_layout.tsx`): rotas login, tabs,
+       cadastro modal, cadastro-escola, esqueci-senha, nova-aula, aula-sessao,
+       nova-turma, cadastros-inativos, resumo-turma, historico, aniversariantes,
+       configuracoes.
+
+
+1.4 Início (portal) — saudação, onboarding visual, escala
+--------------------------------------------------------------------------------
+RF013  [IMPL] Saudação dinâmica + primeiro nome (`GreetingBar.tsx`, `greeting.ts`)
+       — alinhado ao RF legado 01 em `documentacao_ebd_prime.md`.
+RF014  [IMPL] Checklist de 4 passos com contagens reais (`InicioPage.tsx`,
+       `apiListTurmas`, `apiListUsuarios`, `apiListEscala`) quando há congregação.
+RF015  [IMPL] Próximas aulas / edição data e número da lição (sheet);
+       `apiListEscala`, `apiUpdateEscalaAula`, `apiDeleteEscalaAula`.
+RF016  [MOCK] Secção de vídeos tutoriais: títulos/durações estáticos.
+RF017  [IMPL] Persistência "tutorial concluído" (`inicio-onboarding-storage.ts`).
+
+
+1.5 Turmas
+--------------------------------------------------------------------------------
+RF018  [IMPL] Listagem por congregação (`TurmasPage.tsx`, `apiListTurmas`).
+RF019  [IMPL] Criar turma (`nova-turma.tsx`, `apiStoreTurma`).
+RF020  [IMPL] Departamento associado quando aplicável (payload API).
+
+
+1.6 Cadastros (pessoas)
+--------------------------------------------------------------------------------
+RF021  [IMPL] Lista com pesquisa e refresh (`CadastrosPage.tsx`, `apiListUsuarios`).
+RF022  [IMPL] Novo cadastro / edição (`cadastro.tsx`, `apiStoreUsuario`): nome,
+       sexo, nascimento, contactos, endereço, responsáveis, matrícula, professor,
+       turma, etc.
+RF023  [IMPL] Firebase: actualização por `usuario_id`; inativar vínculo aluno-
+       turma (`inativar_vinculo_aluno`).
+RF024  [IMPL] Cadastros inativos (`cadastros-inativos.tsx`,
+       `apiListUsuariosInativos`, `apiAtivarUsuarioAluno`, `apiDeleteUsuarioCadastro`).
+
+
+1.7 Aulas — criação e sessão (chamada + relatório)
+--------------------------------------------------------------------------------
+RF025  [IMPL] Inserir aula na escala (`nova-aula.tsx`, `apiStoreEscala`).
+RF026  [IMPL] Sessão de aula (`aula-sessao.tsx`): hub de turmas; frequência
+       (presença, Bíblia, revista, pontos); contadores Bíblias/revistas/visitantes;
+       oferta (BR), observações, tema; `apiStoreFrequencia`, `apiStoreRelatorio`;
+       leitura `apiGetFrequencia`, `apiGetRelatorio`, `apiListEscala`.
+RF027  [IMPL] Após primeiro relatório: `markRelatorioGeralDisponivel`
+       (`geral-report-gate.ts`) desbloqueia Geral.
+
+
+1.8 Resumo da turma (rankings por intervalo)
+--------------------------------------------------------------------------------
+RF028  [IMPL] Ecrã `resumo-turma.tsx` com intervalos (2º trimestre, ano, custom).
+RF029  [PARCIAL] Demo ou backend ausente: `MOCK_RESUMO`; com API/Firebase:
+       `apiGetTurmaResumoIntervalo`.
+
+
+1.9 Histórico e aniversariantes
+--------------------------------------------------------------------------------
+RF030  [IMPL] Histórico por aluno (`historico.tsx`, `apiHistoricoUsuario`).
+RF031  [IMPL] Aniversariantes do mês (`aniversariantes.tsx`, `apiAniversariantes`).
+
+
+1.10 Geral (painel / relatório consolidado)
+--------------------------------------------------------------------------------
+RF032  [IMPL] Estado vazio: ilustração, mensagem até haver dados.
+RF033  [IMPL] Após gate: `GeralRelatorioDashboard.tsx` — filtros de período,
+       tabs todos/alunos/professores, rankings presença e pontos.
+RF034  [MOCK] Rankings e gráfico com dados de exemplo até endpoint agregado.
+
+
+1.11 Configurações
+--------------------------------------------------------------------------------
+RF035  [IMPL] `configuracoes.tsx`: partilhar, redes, política, termos, versão,
+       sair.
+RF036  [PARCIAL] Algumas opções abrem `Alert` "Em breve".
+
+
+1.12 Temas e acessibilidade UI (componentes transversais)
+--------------------------------------------------------------------------------
+RF037  [IMPL] `Theme` (`constants/theme.ts`) — paleta alinhada à documentação.
+RF038  [IMPL] Teclado: `KeyboardAdaptiveHero`, `KeyboardHideWhenOpen`,
+       `KeyboardSecondaryOpacity` (ver RNF008).
+RF039  [IMPL] `MainTabBar`, `MainPortalHeader`, `InfoHintCard`, etc.
+
+
+1.13 Backlog técnico (evolução funcional planeada)
+--------------------------------------------------------------------------------
+RF040  [FUTURO] Cloud Function para recuperação sem leitura pública de `usuarios`
+       + regras Firestore mais restritivas.
+RF041  [FUTURO] Endpoint agregado para `GeralRelatorioDashboard` (substituir
+       mocks em RF034).
+RF042  [FUTURO] Gate "Geral" alinhado a todas as turmas com relatório no período
+       (refinar RF027 / RN005).
+RF043  [FUTURO] Notificações push (FCM + preferências) — alinhado a RF legado 07.
+RF044  [FUTURO] Exportação PDF / partilha de relatório — alinhado a RF legado 12.
+RF045  [FUTURO] Módulo tesouraria completo — alinhado a RF legado 13.
+RF046  [FUTURO] Pasta `/web` (React Native Web ou PWA) — alinhado a RF legado 14.
+RF047  [FUTURO] JWT / sessão formal no REST (Bearer documentado de ponta a ponta).
+RF048  [FUTURO] Testes automáticos (e2e Detox / Jest backend).
+RF049  [FUTURO] Vídeos tutoriais reais (substituir RF016).
+RF050  [FUTURO] Internacionalização (chaves i18n).
+
+
+================================================================================
+2. REQUISITOS NÃO FUNCIONAIS (RNF001 … RNF009)
+   Modelo alinhado a `documentacao_ebd_prime.md` (secção RNF) — IDs únicos.
+================================================================================
+
+RNF001  [IMPL] Desenvolvimento em React Native (Expo) com TypeScript e Expo
+         Router; geração de APK. (Extensão web responsiva partilhada: ver RF047.)
+RNF002  [IMPL] Backend centralizado: API PHP (PDO) OU Firebase (Firestore + Auth)
+         servindo o app via `api.ts` (não exige ambos simultâneos).
+RNF003  [PARCIAL] Base de dados: MySQL (REST) OU Firestore (Firebase); não há
+         sincronização automática entre os dois motores.
+RNF004  [FUTURO] Deploy e endereçamento profissional (ex.: subdomínio na
+         Hostinger); variáveis `EXPO_PUBLIC_*` em `.env.example`.
+RNF005  [IMPL] Performance de interface: listagens com limites; IDs Firebase com
+         transacções em `_meta/counters`.
+RNF006  [FUTURO] Comunicação HTTPS com certificado SSL no hosting (API e
+         domínios autorizados Firebase); cliente usa apenas URLs configuradas.
+RNF007  [PARCIAL] Escalabilidade: modelo por coleções e contadores; depende de
+         índices Firestore e de capacidade MySQL no hosting.
+RNF008  [IMPL] UX com teclado: login, esqueci senha, cadastro escola, cadastro
+         pessoas — adaptação de layout (componentes em `Keyboard*.tsx`).
+RNF009  [IMPL] Analytics Web opcional (`firebase-analytics.ts`).
+
+
+================================================================================
+3. REGRAS DE NEGÓCIO E INTERFACE (RN001 … RN007)
+================================================================================
+
+RN001  [IMPL] Sem quebras visuais obrigatórias por trimestre no acompanhamento do
+        aluno nas telas principais (timeline contínua no histórico).
+RN002  [IMPL] Mesma lógica no cliente: `api.ts` unifica REST e Firebase.
+RN003  [PARCIAL] Ranking global no Geral: mock (RF034); resumo por turma com
+        backend quando disponível (RF029).
+RN004  [PARCIAL] Visibilidade hierárquica (professor vs admin): parcial via
+        `nivel_acesso` e queries; módulo "campo" completo não inventariado.
+RN005  [PARCIAL] Fecho de relatório consolidado: gate actual = primeiro relatório
+        (`geral-report-gate`); diferente de "todas as turmas enviaram".
+RN006  [MOCK] Troféus / vencedores por departamento no dashboard Geral.
+RN007  [FUTURO] Utilizador com papel duplo (professor + aluno) e conflito de
+        horário / presença justificada (regra legada).
+
+
+================================================================================
+4. API REST (PHP) — ENDPOINTS (RESUMO)
+================================================================================
+Ver lista completa em `docs/api_rest_ebd_prime.md` e `backend/openapi.yaml`.
+
+  GET   /api/health.php
+  POST  /api/auth/login.php
+  POST  /api/auth/forgot-lookup.php
+  POST  /api/auth/forgot-send.php
+  POST  /api/auth/reset-password.php  (+ reset-form.php)
+  POST  /api/auth/logout.php
+  POST  /api/onboarding/sms-request.php | sms-verify.php | register.php
+  POST  /api/usuarios/store.php
+  GET   /api/usuarios/list.php
+  GET   /api/usuarios/historico.php
+  GET   /api/usuarios/aniversariantes.php
+  GET   /api/turmas/list.php
+  POST  /api/turmas/store.php
+  GET   /api/escala/list.php
+  POST  /api/escala/store.php
+  GET   /api/relatorios/get.php
+  POST  /api/relatorios/store.php
+  GET   /api/frequencia/get.php
+  POST  /api/frequencia/store.php
+  GET   /api/meta.php
+
+
+================================================================================
+5. FIREBASE (Firestore + Authentication)
+================================================================================
+
+5.1 Configuração
+--------------------------------------------------------------------------------
+Variáveis `EXPO_PUBLIC_FIREBASE_*`, `EXPO_PUBLIC_DATA_BACKEND=firebase`.
+Ficheiros: `mobile/lib/firebase-backend.ts`, `mobile/lib/backend-config.ts`,
+`mobile/.env.firebase.example`.
+
+
+5.2 Regras (`firestore.rules`)
+--------------------------------------------------------------------------------
+[IMPL] Leitura pública de `congregacoes` (health ping).
+[IMPL] Leitura pública de `usuarios` (MVP: login por login_usuario → e-mail e
+       recuperação de senha). Escrita autenticada.
+[IMPL] Demais coleções EBD: leitura/escrita autenticada.
+[NOTA] Produção: preferir Cloud Function em vez de leitura aberta de `usuarios`.
+
+
+5.3 Paridade (`firebase-backend`)
+--------------------------------------------------------------------------------
+Health, login, logout, forgot, onboarding, CRUD usuarios/turmas/vinculos, escala,
+relatórios, frequência, histórico, aniversariantes, resumo turma (ver `api.ts`).
+
+
+================================================================================
+6. RASTREABILIDADE — REQUISITOS LEGADOS (`documentacao_ebd_prime.md` RF01–RF23)
+   Coluna "Legado" = numeração antiga do markdown original (não confundir com
+   RF001… deste ficheiro).
+================================================================================
+Legenda Estado: I=Implementado  P=Parcial  M=Mock  F=Futuro
+
+  Legado  Descrição breve                              Estado  Notas / mapeamento
+  -------+---------------------------------------------+-------+----------------------
+  RF01    Saudação + nome real                         I       RF013
+  RF02    Níveis de acesso                             P       AuthContext
+  RF03    Hierarquia congregações/setores            P       congregacao
+  RF04    Cadastro membros + aniversariantes           I       RF021–RF024, RF031
+  RF05    Chamada simplificada                         I       RF026
+  RF06    Presença + Bíblia/revista + pontos           I       RF026
+  RF07    Avisos admin tempo real                      F       RF044
+  RF08    Timeline histórico aluno                     I       RF030
+  RF09    Dashboards gráficos                          M       RF034
+  RF10    Rankings automáticos                         P/M     RF028–RF029, RF034
+  RF11    Alertas evasão / lembretes                   F       —
+  RF12    PDF relatórios                               F       RF045
+  RF13    Tesouraria completa                          P       RF026 oferta; RF046
+  RF14    Web espelhada                                F       RF047, RNF001
+  RF15    Escala / professor por data                  I       RF015, RF025
+  RF16    Professor visitante na escala                I       payload escala
+  RF17    Professor escalado → relatório               P       RF026 + escala
+  RF18    Papéis múltiplos aluno+professor             P       modelo dados
+  RF19    Config globais regras negócio                F       RF036
+  RF20    Toggle nome completo vs abreviado            F       —
+  RF21    Toggle pontos extras no ranking              F       —
+  RF22    Aproveitamento com/sem visitantes            P       RF029
+  RF23    Auditoria + logs + lixeira                   P       RF024; sem audit log
+
+
+================================================================================
+7. FICHEIROS PRINCIPAIS (REFERÊNCIA RÁPIDA)
+================================================================================
+Mobile — ecrãs:
+  app/index.tsx, login.tsx, esqueci-senha/index.tsx, cadastro.tsx,
+  cadastro-escola/index.tsx, (tabs)/index.tsx, (tabs)/geral.tsx,
+  turmas.tsx, cadastros.tsx, nova-turma.tsx, nova-aula.tsx, aula-sessao.tsx,
+  resumo-turma.tsx, historico.tsx, aniversariantes.tsx,
+  cadastros-inativos.tsx, configuracoes.tsx, _layout.tsx
+
+Mobile — núcleo:
+  lib/api.ts, lib/firebase-backend.ts, lib/backend-config.ts,
+  lib/auth-storage.ts, lib/greeting.ts, lib/geral-report-gate.ts,
+  lib/inicio-onboarding-storage.ts, lib/phone-br.ts, context/AuthContext.tsx
+
+Mobile — UI:
+  components/GreetingBar.tsx, GeralRelatorioDashboard.tsx, MainTabBar.tsx,
+  MainSwipeHub.tsx, PortalDrawerMenu.tsx, tab-pages/*.tsx, Keyboard*.tsx
+
+Backend: api/**/*.php, lib/*.php, openapi.yaml
+Infra:   firestore.rules, mobile/.env.example, mobile/.env.firebase.example
+
+
+================================================================================
+8. CRITÉRIOS DE ACEITAÇÃO (PRÓXIMA REVISÃO)
+================================================================================
+- RF002–RF004: recuperação REST + Firebase + erros de validação.
+- RF026: gravar e reabrir frequência e relatório.
+- RF024: listar, reativar, eliminar inactivos conforme regras.
+- RF034 / RF042: substituir mocks ou documentar prazo.
+- `firestore.rules`: revisão em staging antes de produção.
+
+
+================================================================================
+FIM DO DOCUMENTO
+================================================================================

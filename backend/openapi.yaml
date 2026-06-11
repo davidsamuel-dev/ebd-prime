@@ -1,0 +1,479 @@
+openapi: 3.0.3
+info:
+  title: EBD Prime API
+  description: |
+    API REST em PHP (PDO) para o projeto EBD Prime — autenticação e cadastro de utilizadores.
+    A versão semântica em `EbdApiMeta::VERSION` (`api/meta.php`) deve coincidir com `info.version`.
+  version: 1.0.0
+  contact:
+    name: EBD Prime
+
+servers:
+  - url: https://ebd.adparaiso.com.br
+    description: Produção (Hostinger — exemplo)
+  - url: http://localhost:8080
+    description: Desenvolvimento local
+
+tags:
+  - name: Sistema
+    description: Operação e diagnóstico
+  - name: Auth
+    description: Autenticação
+  - name: Usuarios
+    description: Gestão de pessoas
+  - name: Turmas
+    description: Turmas e contagens
+
+paths:
+  /api/health.php:
+    get:
+      tags: [Sistema]
+      summary: Estado do serviço e da base de dados
+      description: |
+        Não requer autenticação. Indica se o PHP responde e se o MySQL aceita ligação.
+        HTTP 503 quando `database.status` ≠ `up`.
+      operationId: getHealth
+      responses:
+        '200':
+          description: Serviço e base de dados operacionais
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse200'
+        '503':
+          description: Serviço a responder mas base de dados indisponível ou erro interno
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse503'
+        '405':
+          description: Método não permitido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /api/auth/login.php:
+    post:
+      tags: [Auth]
+      summary: Login com e-mail e senha
+      operationId: postLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              default:
+                value:
+                  usuario: admin@demo.local
+                  senha: demo123
+      responses:
+        '200':
+          description: Credenciais válidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponseSuccess'
+        '400':
+          description: Validação (campos em falta ou JSON inválido)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          description: Credenciais inválidas ou conta inativa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '405':
+          description: Método não permitido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '503':
+          description: Base de dados indisponível
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /api/usuarios/store.php:
+    post:
+      tags: [Usuarios]
+      summary: Criar utilizador (cadastro)
+      operationId: postUsuarioStore
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreUsuarioRequest'
+      responses:
+        '200':
+          description: Registo criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreUsuarioResponseSuccess'
+        '400':
+          description: Validação ou regra de negócio (ex. sem congregação)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          description: Conflito (ex. e-mail duplicado)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '500':
+          description: Erro interno ao guardar
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '503':
+          description: Base de dados indisponível
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /api/turmas/list.php:
+    get:
+      tags: [Turmas]
+      summary: Listar turmas com contagem de alunos
+      operationId: listTurmas
+      parameters:
+        - name: congregacao_id
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista ordenada por nome da turma
+        '503':
+          description: Erro de base de dados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /api/turmas/store.php:
+    post:
+      tags: [Turmas]
+      summary: Criar turma
+      operationId: storeTurma
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nome_turma]
+              properties:
+                nome_turma:
+                  type: string
+                congregacao_id:
+                  type: integer
+                departamento_id:
+                  type: integer
+                  nullable: true
+      responses:
+        '200':
+          description: Turma criada
+        '400':
+          description: Validação ou sem congregação
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '503':
+          description: Base de dados indisponível
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /api/usuarios/list.php:
+    get:
+      tags: [Usuarios]
+      summary: Listar utilizadores com etiqueta de turma
+      operationId: listUsuarios
+      parameters:
+        - name: congregacao_id
+          in: query
+          schema:
+            type: integer
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            maximum: 200
+      responses:
+        '200':
+          description: Lista de utilizadores
+        '503':
+          description: Erro de base de dados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /api/usuarios/historico.php:
+    get:
+      tags: [Usuarios]
+      summary: Estatísticas de frequência do aluno
+      operationId: getUsuarioHistorico
+      parameters:
+        - name: usuario_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Agregados de frequência
+        '404':
+          description: Utilizador não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /api/usuarios/aniversariantes.php:
+    get:
+      tags: [Usuarios]
+      summary: Aniversariantes por mês
+      operationId: getAniversariantes
+      parameters:
+        - name: mes
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+        - name: congregacao_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista ordenada por dia do mês
+
+components:
+  schemas:
+    ErrorEnvelope:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+          example: false
+        error:
+          type: string
+        code:
+          type: string
+          description: Código estável para tratamento programático
+          enum:
+            - METHOD_NOT_ALLOWED
+            - INVALID_JSON
+            - VALIDATION_ERROR
+            - AUTH_INVALID
+            - DB_UNAVAILABLE
+            - NO_CONGREGACAO
+            - DUPLICATE_ENTRY
+            - STORE_FAILED
+            - NOT_FOUND
+
+    ApiMeta:
+      type: object
+      properties:
+        service:
+          type: string
+          example: ebd-prime-api
+        version:
+          type: string
+          example: 1.0.0
+
+    HealthResponse200:
+      type: object
+      required: [ok, service, version, time, database]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        service:
+          type: string
+        version:
+          type: string
+        time:
+          type: string
+          format: date-time
+          description: ISO 8601 (UTC)
+        database:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [up]
+            latency_ms:
+              type: number
+              format: float
+
+    HealthResponse503:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: false
+        service:
+          type: string
+        version:
+          type: string
+        time:
+          type: string
+        database:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [down]
+            latency_ms:
+              type: number
+              nullable: true
+            error_code:
+              type: string
+              example: DB_CONNECTION_FAILED
+
+    LoginRequest:
+      type: object
+      description: O campo `usuario` é o e-mail registado na tabela `usuarios`.
+      required: [usuario, senha]
+      properties:
+        usuario:
+          type: string
+          format: email
+        senha:
+          type: string
+          format: password
+        email:
+          type: string
+          description: Sinónimo aceite pelo servidor (alternativa a `usuario`)
+        password:
+          type: string
+          description: Sinónimo aceite pelo servidor (alternativa a `senha`)
+
+    LoginResponseSuccess:
+      type: object
+      required: [ok, meta, user]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        meta:
+          $ref: '#/components/schemas/ApiMeta'
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+            nome_real:
+              type: string
+            email:
+              type: string
+              nullable: true
+            nivel_acesso:
+              type: string
+            congregacao_id:
+              type: integer
+              nullable: true
+
+    StoreUsuarioRequest:
+      type: object
+      required: [nome_real, sexo]
+      properties:
+        nome_real:
+          type: string
+        nome:
+          type: string
+          description: Sinónimo aceite
+        sexo:
+          type: string
+          enum: [M, F]
+        data_nascimento:
+          type: string
+          format: date
+          nullable: true
+        telefone:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+          nullable: true
+        escolaridade:
+          type: string
+          nullable: true
+        estado_civil:
+          type: string
+          nullable: true
+        logradouro:
+          type: string
+          nullable: true
+        numero:
+          type: string
+          nullable: true
+        bairro:
+          type: string
+          nullable: true
+        cidade:
+          type: string
+          nullable: true
+        estado:
+          type: string
+          nullable: true
+        responsavel_1_nome:
+          type: string
+          nullable: true
+        responsavel_1_tel:
+          type: string
+          nullable: true
+        responsavel_2_nome:
+          type: string
+          nullable: true
+        responsavel_2_tel:
+          type: string
+          nullable: true
+        data_matricula:
+          type: string
+          format: date
+          nullable: true
+        cadastrar_como_professor:
+          type: boolean
+        congregacao_id:
+          type: integer
+          nullable: true
+
+    StoreUsuarioResponseSuccess:
+      type: object
+      required: [ok, meta, id]
+      properties:
+        ok:
+          type: boolean
+        meta:
+          $ref: '#/components/schemas/ApiMeta'
+        id:
+          type: integer
+        message:
+          type: string

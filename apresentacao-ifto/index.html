@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EBD Prime — Apresentação IFTO Paraíso</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="deck">
+
+    <!-- 01 CAPA -->
+    <section class="slide navy slide-cover">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="cover-top">
+          <img src="assets/logo_comprida.png" alt="EBD Prime" class="cover-logo" />
+          <span class="cover-badge-ifto">IFTO · Paraíso do Tocantins</span>
+        </div>
+        <span class="tag">Linguagens e Técnicas de Programação 4</span>
+        <h1>EBD Prime</h1>
+        <p class="subtitle">Aplicativo mobile e para gestão completa da Escola Bíblica Dominical</p>
+        <div class="cover-meta">
+          <div><strong>Aluno</strong> David Samuel Dias de Jesus</div>
+          <div><strong>Professor</strong> Marcos Raimundo</div>
+          <div><strong>Instituição</strong> IFTO — Campus Paraíso</div>
+          <div><strong>Ano</strong> 2026</div>
+        </div>
+      </div>
+      <span class="slide-num">01</span>
+    </section>
+
+    <!-- 02 CONTEXTO -->
+    <section class="slide light">
+      <div class="orb orb-1"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="slide-header">
+          <div><span class="tag">Introdução</span><h2>Contexto e problema</h2></div>
+          <img src="assets/logo_comprida.png" alt="" class="brand-mini" />
+        </div>
+        <p class="lead">A EBD é um pilar das igrejas evangélicas, mas a gestão semanal ainda enfrenta gargalos operacionais que um sistema dedicado pode resolver.</p>
+        <div class="context-visuals">
+          <figure class="context-figure">
+            <img
+              src="assets/papelada.png"
+              alt="Pilha de papéis, pastas e planilhas acumuladas na mesa"
+              loading="lazy"
+            />
+            <figcaption>Gestão manual e papelada</figcaption>
+          </figure>
+          <figure class="context-figure">
+            <img
+              src="assets/mulher_papelada.png"
+              alt="Coordenadora sobrecarregada com documentos e relatórios"
+              loading="lazy"
+            />
+            <figcaption>Sobrecarga operacional semanal</figcaption>
+          </figure>
+        </div>
+        <div class="grid-2" style="margin-top:14px;">
+          <ul class="bullets">
+            <li><strong>Controle manual</strong> de turmas, presença e ofertas em papel ou planilhas</li>
+            <li><strong>Histórico fragmentado</strong> — difícil rastrear evasão ou desempenho do aluno</li>
+          </ul>
+          <ul class="bullets">
+            <li><strong>Relatórios demorados</strong> para consolidar após cada domingo</li>
+            <li><strong>Necessidade</strong> de solução mobile, simples e específica para a EBD</li>
+          </ul>
+        </div>
+      </div>
+      <span class="slide-num">02</span>
+    </section>
+
+    <!-- 03 SOLUÇÃO -->
+    <section class="slide blue slide-solution">
+      <div class="orb orb-1"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="solution-header-row">
+          <div class="solution-copy">
+            <span class="tag">Proposta de valor</span>
+            <h2>O que é o EBD Prime?</h2>
+            <p class="lead">Ecossistema digital que centraliza turmas, cadastros, chamada, materiais pedagógicos, visitantes, oferta e relatórios — na palma da mão.</p>
+          </div>
+          <figure class="solution-figure">
+            <img
+              src="assets/aula_professor.png"
+              alt="Professora da EBD lendo para crianças em sala de aula"
+              loading="lazy"
+            />
+            <figcaption>EBD na prática — professores e alunos</figcaption>
+          </figure>
+        </div>
+        <div class="grid-3 solution-cards">
+          <div class="card"><div class="tech-icon">👥</div><h3>Público-alvo</h3><p>Coordenadores, professores, secretários e liderança da igreja</p></div>
+          <div class="card"><div class="tech-icon">📱</div><h3>Plataforma</h3><p>App Expo (Android/iOS) + site institucional + API REST</p></div>
+          <div class="card"><div class="tech-icon">🌐</div><h3>Produção</h3><p>ebd.adparaiso.com.br — Hostinger, MySQL, HTTPS</p></div>
+        </div>
+      </div>
+      <span class="slide-num">03</span>
+    </section>
+
+    <!-- 04 ARQUITETURA -->
+    <section class="slide navy">
+      <div class="orb orb-1"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <span class="tag">Arquitetura de software</span>
+        <h2>Visão em camadas</h2>
+        <div class="arch-flow">
+          <div class="arch-box"><div class="arch-emoji">📱</div><strong>Cliente Mobile</strong><span>Expo · TypeScript · Expo Router</span></div>
+          <span class="arch-arrow">⟶</span>
+          <div class="arch-box"><div class="arch-emoji">⚡</div><strong>API REST</strong><span>PHP 8 · PDO · JSON · Bearer token</span></div>
+          <span class="arch-arrow">⟶</span>
+          <div class="arch-box"><div class="arch-emoji">🗄️</div><strong>Persistência</strong><span>MySQL · multi-igreja · Hostinger</span></div>
+        </div>
+        <ul class="bullets" style="margin-top:26px;">
+          <li>Comunicação via <strong>HTTPS</strong> — variável <code style="opacity:0.9">EXPO_PUBLIC_API_URL</code> no app</li>
+          <li>Isolamento por <strong>congregacao_id</strong> — cada escola com dados próprios</li>
+          <li>Landing page em <strong>/</strong> e API em <strong>/api/</strong> — mesmo servidor, rotas independentes</li>
+        </ul>
+      </div>
+      <span class="slide-num">04</span>
+    </section>
+
+    <!-- 05 FLUXO DO APLICATIVO -->
+    <section class="slide blue slide-flowchart">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner flowchart-slide">
+        <div class="slide-header">
+          <div>
+            <span class="tag">Jornada do usuário</span>
+            <h2>Fluxo do aplicativo</h2>
+          </div>
+          <img src="assets/logo_comprida.png" alt="" class="brand-mini" />
+        </div>
+
+        <div class="flowchart-legend">
+          <span><i class="lg-setup"></i> Configuração inicial</span>
+          <span><i class="lg-run"></i> Operação no domingo</span>
+          <span><i class="lg-report"></i> Relatórios e indicadores</span>
+        </div>
+
+        <div class="flowchart-body">
+          <div class="flow-lane">
+            <div class="flow-lane-label">Setup</div>
+            <div class="flow-node setup">
+              <span class="flow-step">01</span>
+              <span class="flow-icon">🔐</span>
+              <span class="flow-title">Login</span>
+              <span class="flow-desc">Health check + autenticação</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node setup">
+              <span class="flow-step">02</span>
+              <span class="flow-icon">🏫</span>
+              <span class="flow-title">Cadastro da escola</span>
+              <span class="flow-desc">Onboarding guiado (RF007)</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node setup">
+              <span class="flow-step">03</span>
+              <span class="flow-icon">👨‍👩‍👧‍👦</span>
+              <span class="flow-title">Turmas</span>
+              <span class="flow-desc">Departamentos e classes</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node setup">
+              <span class="flow-step">04</span>
+              <span class="flow-icon">👥</span>
+              <span class="flow-title">Cadastros</span>
+              <span class="flow-desc">Alunos e professores</span>
+            </div>
+          </div>
+
+          <div class="flow-bridge">
+            <span class="flow-bridge-icon">↓</span>
+            <span>Escola configurada — pronta para o domingo</span>
+            <span class="flow-bridge-icon">↓</span>
+          </div>
+
+          <div class="flow-lane">
+            <div class="flow-lane-label">EBD</div>
+            <div class="flow-node run">
+              <span class="flow-step">05</span>
+              <span class="flow-icon">📅</span>
+              <span class="flow-title">Nova aula</span>
+              <span class="flow-desc">Início → botão +</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node run highlight">
+              <span class="flow-step">06</span>
+              <span class="flow-icon">✅</span>
+              <span class="flow-title">Chamada</span>
+              <span class="flow-desc">Presença, Bíblia, oferta</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node run">
+              <span class="flow-step">07</span>
+              <span class="flow-icon">📤</span>
+              <span class="flow-title">Enviar relatório</span>
+              <span class="flow-desc">Por turma e professores</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node report">
+              <span class="flow-step">08</span>
+              <span class="flow-icon">📊</span>
+              <span class="flow-title">Resumo do dia</span>
+              <span class="flow-desc">Aula finalizada → VER RESUMO</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node report highlight">
+              <span class="flow-step">09</span>
+              <span class="flow-icon">🏆</span>
+              <span class="flow-title">Painel Geral</span>
+              <span class="flow-desc">Rankings e indicadores</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="flowchart-foot">
+          Fluxo contínuo: dados sobem para a <strong>API REST</strong> e alimentam relatórios em tempo real na aba <strong>Geral</strong>.
+        </p>
+      </div>
+      <span class="slide-num">05</span>
+    </section>
+
+    <!-- 06 TECNOLOGIAS -->
+    <section class="slide light">
+      <div class="orb orb-1"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="slide-header">
+          <div><span class="tag">Stack tecnológica</span><h2>Tecnologias utilizadas</h2></div>
+          <img src="assets/logo_comprida.png" alt="" class="brand-mini" />
+        </div>
+        <div class="grid-4 tech-stack-grid">
+          <div class="card tech-group-card">
+            <h3>Frontend</h3>
+            <div class="tech-logos">
+              <div class="tech-logo-float" style="--float-delay: 0s">
+                <img src="https://commons.wikimedia.org/wiki/File:React-icon.svg alt=" width="44" height="44" />
+                <span>React Native</span>
+              </div>
+              <div class="tech-logo-float" style="--float-delay: 0.6s">
+                <img src="https://cdn.simpleicons.org/expo/000020" alt="" width="44" height="44" />
+                <span>Expo</span>
+              </div>
+              <div class="tech-logo-float" style="--float-delay: 1.2s">
+                <img src="https://cdn.simpleicons.org/typescript/3178C6" alt="" width="44" height="44" />
+                <span>TypeScript</span>
+              </div>
+              <div class="tech-logo-float" style="--float-delay: 1.8s">
+                <img src="https://cdn.simpleicons.org/reactrouter/CA4245" alt="" width="44" height="44" />
+                <span>Expo Router</span>
+              </div>
+            </div>
+          </div>
+          <div class="card tech-group-card">
+            <h3>Backend</h3>
+            <div class="tech-logos">
+              <div class="tech-logo-float" style="--float-delay: 0.2s">
+                <img src="https://cdn.simpleicons.org/php/777BB4" alt="" width="44" height="44" />
+                <span>PHP + PDO</span>
+              </div>
+              <div class="tech-logo-float" style="--float-delay: 0.8s">
+                <img src="https://cdn.simpleicons.org/composer/885630" alt="" width="44" height="44" />
+                <span>Composer</span>
+              </div>
+              <div class="tech-logo-float" style="--float-delay: 1.4s">
+                <img src="https://cdn.simpleicons.org/json/000000" alt="" width="44" height="44" />
+                <span>REST / JSON</span>
+              </div>
+            </div>
+          </div>
+          <div class="card tech-group-card">
+            <h3>Dados</h3>
+            <div class="tech-logos">
+              <div class="tech-logo-float" style="--float-delay: 0.4s">
+                <img src="https://cdn.simpleicons.org/mysql/4479A1" alt="" width="44" height="44" />
+                <span>MySQL</span>
+              </div>
+              <div class="tech-logo-float" style="--float-delay: 1s">
+                <img src="https://cdn.simpleicons.org/sqlite/003B57" alt="" width="44" height="44" />
+                <span>Migrations SQL</span>
+              </div>
+            </div>
+          </div>
+          <div class="card tech-group-card">
+            <h3>Produção</h3>
+            <div class="tech-logos">
+              <div class="tech-logo-float" style="--float-delay: 0.3s">
+                <img src="https://cdn.simpleicons.org/hostinger/673DE6" alt="" width="44" height="44" />
+                <span>Hostinger</span>
+              </div>
+              <div class="tech-logo-float" style="--float-delay: 0.9s">
+                <img src="https://cdn.simpleicons.org/letsencrypt/003A70" alt="" width="44" height="44" />
+                <span>HTTPS / SSL</span>
+              </div>
+              <div class="tech-logo-float" style="--float-delay: 1.5s">
+                <img src="https://cdn.simpleicons.org/gmail/EA4335" alt="" width="44" height="44" />
+                <span>SMTP · e-mail</span>
+              </div>
+              <div class="tech-logo-float" style="--float-delay: 2.1s">
+                <img src="https://cdn.simpleicons.org/nodedotjs/339933" alt="" width="44" height="44" />
+                <span>Deploy FTP</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="lead" style="margin-top:18px;">
+          Identidade visual: <strong style="color:#0078D4">#0078D4</strong> primary ·
+          <strong>#0C1527</strong> navy · <strong>#10B981</strong> success
+        </p>
+      </div>
+      <span class="slide-num">06</span>
+    </section>
+
+    <!-- 07 REQUISITOS FUNCIONAIS -->
+    <section class="slide navy">
+      <div class="orb orb-2"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <span class="tag">Engenharia de requisitos</span>
+        <h2>Requisitos funcionais principais</h2>
+        <p class="lead" style="margin-bottom:8px;">O que o sistema <strong>deve fazer</strong> — ações e comportamentos voltados ao usuário.</p>
+        <table class="req-table">
+          <thead>
+            <tr><th>ID</th><th>Requisito</th><th>Estado</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>RF001</td><td>Autenticação com usuário e senha; validação do servidor (health check)</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>RF002</td><td>Recuperação de senha por e-mail com link web seguro</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>RF007</td><td>Onboarding: cadastro de nova escola/igreja em fluxo guiado</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>RF018–20</td><td>Gestão de turmas: listar, criar, editar e remover</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>RF021–24</td><td>Cadastro de alunos/professores, inativos, convite de administradores</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>RF025–27</td><td>Sessão de aula: chamada, Bíblia/revista, visitantes, oferta, relatório</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>RF030–31</td><td>Histórico do aluno e lista de aniversariantes do mês</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>RF032–34</td><td>Painel Geral com rankings e indicadores agregados</td><td><span class="badge badge-ok">OK</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <span class="slide-num">07</span>
+    </section>
+
+    <!-- 08 REQUISITOS NÃO FUNCIONAIS -->
+    <section class="slide light">
+      <div class="orb orb-1"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="slide-header">
+          <div>
+            <span class="tag">Engenharia de requisitos</span>
+            <h2>Requisitos não funcionais principais</h2>
+          </div>
+          <img src="assets/logo_comprida.png" alt="" class="brand-mini" />
+        </div>
+        <p class="lead" style="margin-bottom:8px;">Características de <strong>qualidade</strong>, desempenho, segurança e restrições técnicas.</p>
+        <table class="req-table">
+          <thead>
+            <tr><th>ID</th><th>Requisito</th><th>Estado</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>RNF001</td><td>App em React Native (Expo) + TypeScript; build Android e iOS</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>RNF002</td><td>Backend centralizado em PHP (PDO) servindo app e site</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>RNF003</td><td>Base MySQL unificada com sincronização imediata entre dispositivos</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>RNF004</td><td>Deploy em subdomínio profissional (ebd.adparaiso.com.br)</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>RNF005</td><td>Interface de chamada rápida — operação em poucos toques</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>RNF006</td><td>Comunicação HTTPS com certificado SSL ativo</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>RNF007</td><td>Escalabilidade multi-igreja via congregacao_id e índices de login</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>RNF008</td><td>UX adaptativa ao teclado (login, cadastros, formulários longos)</td><td><span class="badge badge-ok">OK</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <span class="slide-num">08</span>
+    </section>
+
+    <!-- 09 LOGIN -->
+    <section class="slide light slide-app-demo">
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <span class="tag">Demonstração · RF001</span>
+        <h2>Tela de Login</h2>
+        <div class="screen-layout screen-layout-app">
+          <div class="screen-notes">
+            <h3>O que destacar na fala</h3>
+            <ul>
+              <li><strong>Logo e identidade</strong> visual EBD Prime</li>
+              <li><strong>Health check</strong> — aviso só se API/MySQL falhar</li>
+              <li>Link <strong>“Cadastre nova escola”</strong> (RF007)</li>
+              <li>Botão <strong>WhatsApp</strong> para suporte</li>
+              <li>Layout adapta ao <strong>teclado</strong> (RNF008)</li>
+            </ul>
+          </div>
+          <div class="screen-shot-wrap screen-shot-wrap-phone">
+            <img
+              src="assets/tela_login.jpeg"
+              alt="Tela de login do app EBD Prime"
+              class="screen-shot"
+            />
+            <span class="screen-shot-url">App · Login</span>
+          </div>
+        </div>
+      </div>
+      <span class="slide-num">09</span>
+    </section>
+
+    <!-- 10 INÍCIO -->
+    <section class="slide navy slide-app-demo">
+      <div class="orb orb-2"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <span class="tag">Demonstração · RF013</span>
+        <h2>Início — escala e checklist</h2>
+        <div class="screen-layout screen-layout-app">
+          <div class="screen-notes">
+            <h3>O que destacar na fala</h3>
+            <ul>
+              <li>Header com <strong>logo EBD Prime</strong> e ações rápidas (+, calendário)</li>
+              <li>Checklist <strong>“comece por aqui”</strong> com 4 passos iniciais</li>
+              <li><strong>Escala de aulas</strong> do trimestre</li>
+              <li>Long press para <strong>editar/remover</strong> aula</li>
+            </ul>
+          </div>
+          <div class="screen-shot-wrap screen-shot-wrap-phone">
+            <img
+              src="assets/tela_inicial_onboarding.jpeg"
+              alt="Tela inicial do app com onboarding e checklist de 4 passos"
+              class="screen-shot"
+            />
+            <span class="screen-shot-url">App · Início · Onboarding</span>
+          </div>
+        </div>
+      </div>
+      <span class="slide-num">10</span>
+    </section>
+
+    <!-- 11 TURMAS E CADASTRO -->
+    <section class="slide light slide-app-demo">
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <span class="tag">Demonstração · RF018 e RF021–24</span>
+        <h2>Turmas e cadastro</h2>
+        <div class="screen-layout screen-layout-app">
+          <div class="screen-notes">
+            <h3>O que destacar na fala</h3>
+            <ul>
+              <li>Aba <strong>Turmas</strong> — listagem por departamento (AGE, CIBEP, JGE…)</li>
+              <li>Botão <strong>+</strong> abre formulário para <strong>nova turma</strong></li>
+              <li>Aba <strong>Cadastros</strong> — alunos e professores com busca por nome</li>
+              <li>Seleção de turma, gênero e opção <strong>cadastrar como professor</strong></li>
+            </ul>
+          </div>
+          <div class="screen-phones-duo">
+            <div class="screen-shot-wrap screen-shot-wrap-phone">
+              <img
+                src="assets/tela_cadastro_turma.jpeg"
+                alt="Formulário de cadastro de nova turma na aba Turmas"
+                class="screen-shot"
+              />
+              <span class="screen-shot-url">App · Turmas · Nova turma</span>
+            </div>
+            <span class="screen-phones-arrow" aria-hidden="true">+</span>
+            <div class="screen-shot-wrap screen-shot-wrap-phone">
+              <img
+                src="assets/tela_cadastro_pessoa.jpeg"
+                alt="Formulário de cadastro de aluno ou professor na aba Cadastros"
+                class="screen-shot"
+              />
+              <span class="screen-shot-url">App · Cadastros · Novo cadastro</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="slide-num">11</span>
+    </section>
+
+    <!-- 12 SESSÃO -->
+    <section class="slide navy slide-app-demo">
+      <div class="orb orb-1"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <span class="tag">Demonstração · RF026</span>
+        <h2>Sessão de aula (chamada)</h2>
+        <div class="screen-layout screen-layout-app">
+          <div class="screen-notes">
+            <h3>O que destacar na fala</h3>
+            <ul>
+              <li><strong>Toque na aula</strong> na lista para abrir a sessão</li>
+              <li><strong>Presença</strong> com um toque por aluno</li>
+              <li>Contadores: <strong>Bíblia, revista, visitantes</strong></li>
+              <li>Campo de <strong>oferta</strong> e botão <strong>ENVIAR RELATÓRIO</strong> (RNF005)</li>
+            </ul>
+          </div>
+          <div class="screen-phones-duo">
+            <div class="screen-shot-wrap screen-shot-wrap-phone">
+              <img
+                src="assets/tela_lista_aulas.jpeg"
+                alt="Lista de aulas na aba Início com chamadas pendentes"
+                class="screen-shot"
+              />
+              <span class="screen-shot-url">App · Lista de aulas</span>
+            </div>
+            <span class="screen-phones-arrow" aria-hidden="true">→</span>
+            <div class="screen-shot-wrap screen-shot-wrap-phone">
+              <img
+                src="assets/tela_chamada.jpeg"
+                alt="Tela de chamada dos alunos e relatório da classe"
+                class="screen-shot"
+              />
+              <span class="screen-shot-url">App · Chamada · Relatório</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="slide-num">12</span>
+    </section>
+
+    <!-- 13 RELATÓRIO DO DIA -->
+    <section class="slide light slide-app-demo">
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <span class="tag">Demonstração · RF027</span>
+        <h2>Relatório da aula finalizada</h2>
+        <div class="screen-layout screen-layout-app">
+          <div class="screen-notes">
+            <h3>O que destacar na fala</h3>
+            <ul>
+              <li>Após <strong>todas as turmas enviarem</strong>, o dia fica finalizado</li>
+              <li>Botão <strong>VER RESUMO</strong> na sessão da aula</li>
+              <li><strong>Resumo final</strong> — matriculados, presentes, ausentes e visitantes</li>
+              <li><strong>Aproveitamento</strong>, oferta e totais consolidados do dia</li>
+              <li>Dados reais via <strong>aula-resumo.php</strong></li>
+            </ul>
+          </div>
+          <div class="screen-shot-wrap screen-shot-wrap-phone">
+            <img
+              src="assets/tela_relatorio_aula.jpeg"
+              alt="Resumo final da aula com relatório geral e aproveitamento"
+              class="screen-shot"
+            />
+            <span class="screen-shot-url">App · Resumo final · Relatório geral</span>
+          </div>
+        </div>
+      </div>
+      <span class="slide-num">13</span>
+    </section>
+
+    <!-- 14 PAINEL GERAL -->
+    <section class="slide navy slide-app-demo">
+      <div class="orb orb-1"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <span class="tag">Demonstração · RF032–34</span>
+        <h2>Painel Geral — relatórios consolidados</h2>
+        <div class="screen-layout screen-layout-app">
+          <div class="screen-notes">
+            <h3>O que destacar na fala</h3>
+            <ul>
+              <li>Aba <strong>Geral</strong> na barra inferior (ícone gráfico)</li>
+              <li><strong>Ranking de turmas</strong> — média de presença por departamento</li>
+              <li><strong>Ranking de presença</strong> — alunos e professores no intervalo</li>
+              <li>Filtros: <strong>última aula</strong>, trimestre ou ano</li>
+              <li>Dados via API <strong>geral-resumo.php</strong></li>
+            </ul>
+          </div>
+          <div class="screen-shot-wrap screen-shot-wrap-phone">
+            <img
+              src="assets/relatório_geral.jpeg"
+              alt="Painel Geral com rankings de turmas e presença"
+              class="screen-shot"
+            />
+            <span class="screen-shot-url">App · Geral · Rankings</span>
+          </div>
+        </div>
+      </div>
+      <span class="slide-num">14</span>
+    </section>
+
+    <!-- 15 CÓDIGO HEALTH -->
+    <section class="slide light">
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="two-col-content">
+          <div>
+            <span class="tag">Implementação · Backend</span>
+            <h2>Health check (RNF004)</h2>
+            <p class="lead">Endpoint público que valida PHP + MySQL antes do login — usado pelo app e pelo monitoramento.</p>
+            <ul class="bullets" style="margin-top:14px;">
+              <li>Sem dados sensíveis expostos</li>
+              <li>CORS habilitado para o cliente mobile</li>
+              <li>Resposta JSON padronizada</li>
+            </ul>
+          </div>
+          <div class="code-wrap">
+            <p class="code-label">backend/api/health.php</p>
+            <pre><span class="cm">// Liveness + readiness do MySQL</span>
+<span class="kw">header</span>(<span class="str">'Content-Type: application/json'</span>);
+<span class="kw">header</span>(<span class="str">'Access-Control-Allow-Origin: *'</span>);
+
+$dbStatus = <span class="str">'down'</span>;
+<span class="cm">// PDO: testa latência do banco</span>
+
+<span class="kw">echo</span> <span class="fn">json_encode</span>([
+  <span class="str">'ok'</span> => <span class="kw">true</span>,
+  <span class="str">'service'</span> => <span class="str">'ebd-prime-api'</span>,
+  <span class="str">'database'</span> => [
+    <span class="str">'status'</span> => $dbStatus,
+    <span class="str">'latency_ms'</span> => $dbLatencyMs,
+  ],
+]);</pre>
+          </div>
+        </div>
+      </div>
+      <span class="slide-num">15</span>
+    </section>
+
+    <!-- 16 CÓDIGO RECUPERAÇÃO DE SENHA -->
+    <section class="slide navy">
+      <div class="orb orb-2"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="two-col-content">
+          <div>
+            <span class="tag">Implementação · Backend</span>
+            <h2>Esqueci a senha (RF002)</h2>
+            <p class="lead">O app envia usuário e e-mail; a API valida a conta, gera um token único e dispara o link de redefinição via <strong>SMTP Hostinger</strong> (PHPMailer).</p>
+            <ul class="bullets" style="margin-top:14px;">
+              <li>Token armazenado como <strong>hash SHA-256</strong> — válido por 30 minutos</li>
+              <li>E-mail HTML com link web para <strong>nova senha</strong></li>
+              <li>SMTP: <code>smtp.hostinger.com</code> · credenciais no <code>.env</code></li>
+              <li>Após redefinir, o usuário volta ao app com acesso restaurado</li>
+            </ul>
+          </div>
+          <div class="code-wrap">
+            <p class="code-label">backend/api/auth/forgot-send.php</p>
+            <pre><span class="cm">// RF002 — gera token e envia e-mail SMTP</span>
+$plainToken = <span class="fn">bin2hex</span>(<span class="fn">random_bytes</span>(32));
+$tokenHash = <span class="fn">hash</span>(<span class="str">'sha256'</span>, $plainToken);
+$expiresAt = (<span class="kw">new</span> DateTimeImmutable(<span class="str">'+30 minutes'</span>))
+  ->format(<span class="str">'Y-m-d H:i:s'</span>);
+
+$pdo->prepare(
+  <span class="str">'INSERT INTO recuperacao_senhas
+   (usuario_id, token_hash, expires_at) VALUES (...)'</span>
+)->execute([...]);
+
+$resetLink = $baseLink . <span class="str">'?token='</span>
+  . <span class="fn">rawurlencode</span>($plainToken);
+
+<span class="fn">ebd_send_password_reset_email</span>(
+  $dbEmail, $resetLink, $congregacaoId
+); <span class="cm">// PHPMailer → SMTP Hostinger</span></pre>
+          </div>
+        </div>
+      </div>
+      <span class="slide-num">16</span>
+    </section>
+
+    <!-- 17 DEPLOY -->
+    <section class="slide blue slide-deploy">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="slide-header">
+          <div>
+            <span class="tag">Produção · RNF004</span>
+            <h2>Deploy e ambiente real</h2>
+          </div>
+          <div class="deploy-hostinger-badge" aria-label="Hospedagem Hostinger">
+            <img src="https://cdn.simpleicons.org/hostinger/FFFFFF" alt="" width="28" height="28" />
+            <span>Hostinger</span>
+          </div>
+        </div>
+        <p class="lead">Publicação automatizada do repositório local até produção — pacote PHP + landing enviado por <strong>FTP/FTPS</strong> para a Hostinger.</p>
+
+        <div class="deploy-flow">
+          <div class="deploy-step">
+            <span class="deploy-step-num">01</span>
+            <span class="deploy-step-icon">📦</span>
+            <strong>Empacotar</strong>
+            <span><code>npm run deploy:hostinger</code></span>
+          </div>
+          <span class="deploy-arrow">→</span>
+          <div class="deploy-step">
+            <span class="deploy-step-num">02</span>
+            <span class="deploy-step-icon">📤</span>
+            <strong>Upload FTP</strong>
+            <span>basic-ftp · FTPS · porta 21</span>
+          </div>
+          <span class="deploy-arrow">→</span>
+          <div class="deploy-step deploy-step-highlight">
+            <span class="deploy-step-num">03</span>
+            <span class="deploy-step-icon">🖥️</span>
+            <strong>Hostinger</strong>
+            <span>hPanel · MySQL · SSL</span>
+          </div>
+          <span class="deploy-arrow">→</span>
+          <div class="deploy-step">
+            <span class="deploy-step-num">04</span>
+            <span class="deploy-step-icon">🌐</span>
+            <strong>Online</strong>
+            <span>ebd.adparaiso.com.br</span>
+          </div>
+        </div>
+
+        <div class="grid-3 deploy-cards" style="margin-top:18px;">
+          <div class="card">
+            <h3>Script de deploy</h3>
+            <p class="card-body">
+              <code>prepare-hostinger-deploy.php</code> monta a pasta
+              <code>deploy/hostinger-ebd.adparaiso.com.br/</code> com API, vendor, landing e <code>.env</code> de produção.
+            </p>
+          </div>
+          <div class="card">
+            <h3>FTP na Hostinger</h3>
+            <p class="card-body">
+              Credenciais em <code>backend/.env.deploy</code> — host, usuário e senha do FTP do hPanel.
+              Envio recursivo para a <strong>raiz do subdomínio</strong>.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Validação pós-deploy</h3>
+            <p class="card-body">
+              Site: <strong>ebd.adparaiso.com.br</strong><br>
+              API: <strong>/api/health.php</strong><br>
+              SMTP: <strong>smtp.hostinger.com</strong>
+            </p>
+          </div>
+        </div>
+
+        <ul class="bullets deploy-bullets">
+          <li>Um comando: <strong>npm run deploy:hostinger</strong> — empacota e envia por FTP sem passo manual</li>
+          <li>Infraestrutura <strong>Hostinger</strong>: hospedagem compartilhada, banco MySQL e certificado HTTPS</li>
+          <li>Landing em <strong>/</strong> e API em <strong>/api/</strong> no mesmo servidor — rotas isoladas (RNF007)</li>
+        </ul>
+      </div>
+      <span class="slide-num">17</span>
+    </section>
+
+    <!-- 18 SITE -->
+    <section class="slide light">
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <span class="tag">Produto completo</span>
+        <h2>Site institucional</h2>
+        <div class="screen-layout screen-layout-site">
+          <div class="screen-notes">
+            <h3>Conteúdo do site</h3>
+            <ul>
+              <li>Hero com proposta de valor</li>
+              <li>Funcionalidades e <strong>como funciona</strong></li>
+              <li><strong>Central de ajuda</strong> (ajuda.html) — tutoriais Admin e Professor</li>
+              <li>FAQ, botão Ajuda no app/login e <strong>CTA WhatsApp</strong></li>
+              <li>Mesma paleta visual do app</li>
+            </ul>
+          </div>
+          <div class="screen-shot-wrap">
+            <img
+              src="assets/tela_do_site.png"
+              alt="Landing page EBD Prime — ebd.adparaiso.com.br"
+              class="screen-shot"
+              width="900"
+              height="506"
+            />
+            <span class="screen-shot-url">ebd.adparaiso.com.br</span>
+          </div>
+        </div>
+      </div>
+      <span class="slide-num">18</span>
+    </section>
+
+    <!-- 19 ROADMAP -->
+    <section class="slide navy">
+      <div class="orb orb-1"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <span class="tag">Evolução</span>
+        <h2>Próximos passos (backlog)</h2>
+        <div class="grid-3" style="margin-top:18px;">
+          <div class="card"><h3>RF040+</h3><p>Notificações push, exportação PDF e tesouraria completa</p></div>
+          <div class="card"><h3>RF014</h3><p>Versão web espelhada do app no navegador</p></div>
+          <div class="card"><h3>Testes</h3><p>Testes automatizados (e2e) e cobertura da API REST</p></div>
+        </div>
+        <ul class="bullets" style="margin-top:22px;">
+          <li>Testes automatizados e documentação OpenAPI expandida</li>
+          <li>Publicação nas lojas (Google Play / App Store)</li>
+          <li>Vídeos tutoriais reais no onboarding</li>
+        </ul>
+      </div>
+      <span class="slide-num">19</span>
+    </section>
+
+    <!-- 20 CONCLUSÃO -->
+    <section class="slide blue slide-cover">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <img src="assets/logo_fundo_azul.png" alt="" style="width:80px;border-radius:18px;margin-bottom:22px;box-shadow:0 12px 40px rgba(0,0,0,0.4);" />
+        <span class="tag">Encerramento</span>
+        <h2>Conclusão</h2>
+        <ul class="bullets" style="margin-top:18px;">
+          <li>EBD Prime ataca um <strong>problema real</strong> com arquitetura profissional em produção</li>
+          <li><strong>RF principais implementados</strong> — autenticação, turmas, chamada, relatórios</li>
+          <li><strong>RNF atendidos</strong> — HTTPS, multi-igreja, performance, UX mobile</li>
+          <li>Site + app + API formam um <strong>produto completo</strong></li>
+        </ul>
+        <p class="subtitle subtitle-lg">Obrigado! Perguntas?</p>
+        <p class="footer-url">David Samuel Dias de Jesus · Prof. Marcos Raimundo · IFTO Paraíso</p>
+      </div>
+      <span class="slide-num">20</span>
+    </section>
+
+    <!-- 21 ACESSO — QR CODES -->
+    <section class="slide navy slide-qr-final">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="slide-header">
+          <div>
+            <span class="tag">Acesso ao projeto</span>
+            <h2>Baixe e explore</h2>
+          </div>
+          <img src="assets/logo_comprida.png" alt="" class="brand-mini" />
+        </div>
+        <p class="lead">Escaneie os QR codes para instalar o app ou acessar o repositório com o código-fonte completo.</p>
+        <div class="qr-grid">
+          <article class="qr-card">
+            <div class="qr-slot qr-slot--filled" aria-label="QR code para download do APK">
+              <img
+                src="assets/QR_CODE_APK.png"
+                alt="QR code para baixar o APK do EBD Prime"
+              />
+            </div>
+            <h3>Baixar o app</h3>
+            <p>Instale o <strong>EBD Prime</strong> no Android e teste na próxima aula.</p>
+            <span class="qr-link-hint">Escaneie para baixar o APK</span>
+          </article>
+          <article class="qr-card">
+            <div class="qr-slot qr-slot--filled" aria-label="QR code do repositório GitHub">
+              <img
+                src="assets/QR_CODE_GIT.png"
+                alt="QR code do repositório GitHub ebd-prime"
+              />
+            </div>
+            <h3>Repositório Git</h3>
+            <p>App, API, site e documentação do projeto.</p>
+            <a
+              href="https://github.com/davidsamuel-dev/ebd-prime"
+              class="qr-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >github.com/davidsamuel-dev/ebd-prime</a>
+          </article>
+        </div>
+        <p class="footer-url" style="margin-top:22px;text-align:center;width:100%;">
+          David Samuel Dias de Jesus · IFTO Paraíso · 2026
+        </p>
+      </div>
+      <span class="slide-num">21</span>
+    </section>
+
+  </div>
+
+  <script src="present.js"></script>
+</body>
+</html>

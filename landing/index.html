@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="EBD Prime — aplicativo para organizar a Escola Bíblica Dominical: turmas, chamada, relatórios e gestão completa para sua igreja." />
+  <meta name="theme-color" content="#0078D4" />
+  <title>EBD Prime — Gestão da Escola Bíblica Dominical</title>
+  <link rel="icon" href="api/landing-asset.php?f=logo_fundo_azul.png" type="image/png" />
+  <style>
+    :root {
+      --primary: #0078D4;
+      --primary-dark: #005A9E;
+      --primary-deep: #003E7E;
+      --accent: #3B82F6;
+      --bg: #FFFFFF;
+      --bg-soft: #F0F9FF;
+      --card: #F3F4F6;
+      --text: #1F2937;
+      --muted: #6B7280;
+      --border: #E5E7EB;
+      --success: #10B981;
+      --shadow: 0 4px 24px rgba(0, 30, 80, 0.08);
+      --shadow-lg: 0 20px 60px rgba(0, 30, 80, 0.14);
+      --radius: 16px;
+      --radius-lg: 24px;
+      --nav-h: 72px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; text-decoration: none; }
+
+    .container {
+      width: min(1120px, calc(100% - 40px));
+      margin-inline: auto;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 100;
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      transition: background 0.3s, box-shadow 0.3s, backdrop-filter 0.3s;
+    }
+
+    .nav.scrolled {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 0 var(--border);
+    }
+
+    /* No topo (hero azul): logo e links claros para contraste */
+    .nav:not(.scrolled) {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .nav:not(.scrolled) .nav-logo {
+      filter: brightness(0) invert(1);
+    }
+
+    .nav:not(.scrolled) .nav-links a {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .nav:not(.scrolled) .nav-links a:hover {
+      color: #fff;
+    }
+
+    .nav:not(.scrolled) .btn-outline {
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .nav:not(.scrolled) .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
+
+    .nav:not(.scrolled) .btn-primary {
+      background: #fff;
+      color: var(--primary);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    }
+
+    .nav:not(.scrolled) .btn-primary:hover {
+      background: #f8fbff;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+    }
+
+    .nav:not(.scrolled) .menu-toggle {
+      color: #fff;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .nav-logo { height: 36px; width: auto; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links a {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--primary); }
+
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s, opacity 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(0, 120, 212, 0.35);
+    }
+
+    .btn-primary:hover { box-shadow: 0 8px 24px rgba(0, 120, 212, 0.45); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    .btn-outline:hover { background: var(--bg-soft); }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.25); }
+
+    .btn-whatsapp {
+      background: #25D366;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(37, 211, 102, 0.35);
+    }
+
+    .btn-sm { padding: 9px 18px; font-size: 0.875rem; }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: calc(var(--nav-h) + 48px) 0 80px;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(145deg, var(--primary) 0%, var(--primary-dark) 45%, var(--primary-deep) 100%);
+      z-index: 0;
+    }
+
+    .hero-bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(255,255,255,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 80%, rgba(0,0,0,0.15) 0%, transparent 55%);
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      opacity: 0.06;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      backdrop-filter: blur(4px);
+    }
+
+    .hero-badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .hero h1 {
+      margin: 0 0 20px;
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.12;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(90deg, #fff 0%, #BFDBFE 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-lead {
+      margin: 0 0 32px;
+      font-size: clamp(1.05rem, 2vw, 1.2rem);
+      color: rgba(255, 255, 255, 0.88);
+      max-width: 520px;
+      line-height: 1.65;
+    }
+
+    .hero-ctas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+    }
+
+    .hero-stat strong {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .hero-stat span {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .phone-mockup {
+      position: relative;
+      width: min(280px, 80vw);
+      aspect-ratio: 9/19;
+      background: #0C1527;
+      border-radius: 40px;
+      padding: 12px;
+      box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255,255,255,0.1);
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 30px;
+      overflow: hidden;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      gap: 16px;
+    }
+
+    .phone-screen img { width: 75%; }
+
+    .phone-notch {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 24px;
+      background: #0C1527;
+      border-radius: 0 0 16px 16px;
+      z-index: 2;
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(59,130,246,0.4) 0%, transparent 70%);
+      filter: blur(40px);
+      z-index: -1;
+    }
+
+    /* ── Sections ── */
+    section { padding: 96px 0; }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      margin: 0 0 16px;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .section-lead {
+      margin: 0 auto 56px;
+      max-width: 620px;
+      font-size: 1.1rem;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    .section-header { text-align: center; margin-bottom: 56px; }
+
+    /* ── Features ── */
+    .features { background: var(--bg-soft); }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow);
+      border-color: #BFDBFE;
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--bg-soft), #DBEAFE);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      color: var(--primary);
+    }
+
+    .feature-card h3 {
+      margin: 0 0 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .feature-card p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── Steps ── */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      counter-reset: step;
+    }
+
+    .step-card {
+      position: relative;
+      text-align: center;
+      padding: 32px 20px 28px;
+      border-radius: var(--radius);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      counter-increment: step;
+    }
+
+    .step-card::before {
+      content: counter(step);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .step-card h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .step-card p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* ── Benefits ── */
+    .benefits { background: linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%); }
+
+    .benefits-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: center;
+    }
+
+    .benefits-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .benefits-list li {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 20px;
+      background: var(--bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .benefit-check {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #ECFDF5;
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .benefit-text strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+
+    .benefit-text span {
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .benefits-visual {
+      display: flex;
+      justify-content: center;
+    }
+
+    .benefits-card-stack {
+      position: relative;
+      width: min(340px, 100%);
+    }
+
+    .stack-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .stack-card + .stack-card {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      right: -24px;
+      z-index: -1;
+      opacity: 0.6;
+      transform: scale(0.96);
+    }
+
+    .stack-card h4 { margin: 0 0 8px; color: var(--primary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .stack-card .metric { font-size: 2rem; font-weight: 800; margin-bottom: 4px; }
+    .stack-card .metric-label { font-size: 0.9rem; color: var(--muted); }
+
+    /* ── Audience ── */
+    .audience-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .audience-card {
+      padding: 32px 28px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(160deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #fff;
+    }
+
+    .audience-card:nth-child(2) {
+      background: linear-gradient(160deg, #1E40AF 0%, var(--primary) 100%);
+    }
+
+    .audience-card:nth-child(3) {
+      background: linear-gradient(160deg, var(--primary-dark) 0%, var(--primary-deep) 100%);
+    }
+
+    .audience-card h3 { margin: 0 0 12px; font-size: 1.2rem; }
+    .audience-card p { margin: 0; opacity: 0.9; font-size: 0.95rem; line-height: 1.65; }
+
+    /* ── FAQ ── */
+    .faq { background: var(--bg-soft); }
+
+    .faq-list {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .faq-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .faq-question {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 24px;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .faq-question svg { flex-shrink: 0; transition: transform 0.25s; color: var(--primary); }
+    .faq-item.open .faq-question svg { transform: rotate(180deg); }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.35s ease;
+    }
+
+    .faq-item.open .faq-answer {
+      max-height: 240px;
+      padding: 0 24px 20px;
+    }
+
+    .faq-answer p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 80px 0;
+    }
+
+    .cta-box {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
+      border-radius: var(--radius-lg);
+      padding: clamp(40px, 6vw, 64px);
+      text-align: center;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-box::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 80% at 100% 0%, rgba(255,255,255,0.12) 0%, transparent 60%);
+    }
+
+    .cta-box > * { position: relative; z-index: 1; }
+
+    .cta-box h2 {
+      margin: 0 0 16px;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 800;
+    }
+
+    .cta-box p {
+      margin: 0 auto 32px;
+      max-width: 520px;
+      opacity: 0.9;
+      font-size: 1.05rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+    }
+
+    .cta-buttons .btn-outline {
+      border-color: rgba(255,255,255,0.6);
+      color: #fff;
+    }
+
+    .cta-buttons .btn-outline:hover { background: rgba(255,255,255,0.12); }
+
+    /* ── Footer ── */
+    footer {
+      background: #0C1527;
+      color: rgba(255, 255, 255, 0.75);
+      padding: 56px 0 32px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .footer-brand img { height: 36px; margin-bottom: 16px; filter: brightness(0) invert(1); }
+    .footer-brand p { margin: 0; font-size: 0.92rem; line-height: 1.65; max-width: 300px; }
+
+    .footer-col h4 {
+      margin: 0 0 16px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #fff;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-col a {
+      font-size: 0.92rem;
+      transition: color 0.2s;
+    }
+
+    .footer-col a:hover { color: #fff; }
+
+    .footer-bottom {
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.85rem;
+    }
+
+    /* ── Reveal animation ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 960px) {
+      .hero-inner { grid-template-columns: 1fr; text-align: center; }
+      .hero-lead { margin-inline: auto; }
+      .hero-ctas, .hero-stats { justify-content: center; }
+      .hero-visual { order: -1; }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .steps-grid { grid-template-columns: repeat(2, 1fr); }
+      .benefits-layout { grid-template-columns: 1fr; }
+      .audience-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      section { padding: 72px 0; }
+
+      .nav-links, .nav-actions .btn-outline { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: var(--nav-h);
+        left: 0;
+        right: 0;
+        background: #fff;
+        padding: 20px;
+        gap: 16px;
+        box-shadow: var(--shadow);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .menu-toggle { display: block; }
+
+      .features-grid,
+      .steps-grid { grid-template-columns: 1fr; }
+
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navegação -->
+  <nav class="nav" id="nav">
+    <div class="container nav-inner">
+      <a href="#" aria-label="EBD Prime — início">
+        <img src="api/landing-asset.php?f=logo_comprida.png" alt="EBD Prime" class="nav-logo" width="144" height="36" />
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#funcionalidades">Funcionalidades</a></li>
+        <li><a href="#como-funciona">Como funciona</a></li>
+        <li><a href="#beneficios">Benefícios</a></li>
+        <li><a href="ajuda.html">Ajuda</a></li>
+        <li><a href="#faq">Perguntas</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="https://wa.me/5563991249775?text=Ol%C3%A1%2C%20quero%20saber%20mais%20sobre%20o%20EBD%20Prime" class="btn btn-outline btn-sm" target="_blank" rel="noopener">Fale conosco</a>
+        <a href="#contato" class="btn btn-primary btn-sm">Começar agora</a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero" id="inicio">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="container hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          Gestão completa da EBD na palma da mão
+        </div>
+        <h1>Organize sua <span>Escola Bíblica Dominical</span> com simplicidade</h1>
+        <p class="hero-lead">
+          Turmas, chamada, materiais, visitantes, ofertas e relatórios — tudo num só aplicativo pensado para coordenadores, professores e líderes da igreja.
+        </p>
+        <div class="hero-ctas">
+          <a href="#contato" class="btn btn-primary">Cadastrar minha escola</a>
+          <a href="https://wa.me/5563991249775?text=Ol%C3%A1%2C%20quero%20saber%20mais%20sobre%20o%20EBD%20Prime" class="btn btn-ghost" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.532 5.855L0 24l6.336-1.662A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.01-1.37l-.36-.214-3.76.986 1.004-3.66-.234-.375A9.818 9.818 0 1112 21.818z"/></svg>
+            WhatsApp
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <strong>100%</strong>
+            <span>focado na EBD</span>
+          </div>
+          <div class="hero-stat">
+            <strong>Android</strong>
+            <span>e iPhone</span>
+          </div>
+          <div class="hero-stat">
+            <strong>Multi-igreja</strong>
+            <span>cada escola isolada</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-glow"></div>
+        <div class="phone-mockup">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <img src="api/landing-asset.php?f=logo1.png" alt="Tela do EBD Prime" width="200" height="110" />
+            <p style="margin:0;font-size:0.75rem;color:#6B7280;text-align:center;">Turmas · Chamada · Relatórios</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Funcionalidades -->
+  <section class="features" id="funcionalidades">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Funcionalidades</span>
+        <h2 class="section-title">Tudo que sua escola precisa no dia a dia</h2>
+        <p class="section-lead">Do cadastro da igreja à chamada da aula — ferramentas práticas para quem coordena, ensina e acompanha a EBD.</p>
+      </div>
+      <div class="features-grid">
+        <article class="feature-card reveal">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <h3>Turmas e cadastros</h3>
+          <p>Crie turmas, cadastre alunos e professores, pesquise rapidamente e gerencie cadastros inativos com segurança.</p>
+        </article>
+        <article class="feature-card reveal">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          </div>
+          <h3>Escala de aulas</h3>
+          <p>Agende as datas de cada turma, edite ou remova aulas com facilidade e mantenha o calendário sempre organizado.</p>
+        </article>
+        <article class="feature-card reveal">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          </div>
+          <h3>Chamada inteligente</h3>
+          <p>Marque presenças, registre quem trouxe Bíblia e revista, pontos de participação e visitantes — tudo na sessão da aula.</p>
+        </article>
+        <article class="feature-card reveal">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          </div>
+          <h3>Oferta e relatório</h3>
+          <p>Registre a oferta da aula e gere o relatório completo para a liderança acompanhar cada encontro da EBD.</p>
+        </article>
+        <article class="feature-card reveal">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          </div>
+          <h3>Painel e rankings</h3>
+          <p>Visualize resumos por turma, histórico do aluno, aniversariantes e indicadores para decisões mais informadas.</p>
+        </article>
+        <article class="feature-card reveal">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Seguro e multi-igreja</h3>
+          <p>Cada congregação com dados isolados, login protegido, recuperação de senha por e-mail e convite de administradores.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Como funciona -->
+  <section id="como-funciona">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Como funciona</span>
+        <h2 class="section-title">Em quatro passos sua escola está pronta</h2>
+        <p class="section-lead">Um fluxo simples para começar — mesmo quem não é da área técnica consegue acompanhar.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card reveal">
+          <h3>Cadastre a escola</h3>
+          <p>Assistente guiado com dados da igreja, responsável e credenciais de acesso.</p>
+        </div>
+        <div class="step-card reveal">
+          <h3>Monte as turmas</h3>
+          <p>Organize as classes da EBD conforme a estrutura da sua congregação.</p>
+        </div>
+        <div class="step-card reveal">
+          <h3>Cadastre as pessoas</h3>
+          <p>Alunos, professores e equipe — tudo pesquisável e fácil de manter.</p>
+        </div>
+        <div class="step-card reveal">
+          <h3>Registre as aulas</h3>
+          <p>Chamada, materiais, visitantes e relatório em cada encontro dominical.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefícios -->
+  <section class="benefits" id="beneficios">
+    <div class="container benefits-layout">
+      <div class="reveal">
+        <span class="section-label">Por que o EBD Prime?</span>
+        <h2 class="section-title" style="text-align:left;margin-bottom:24px;">Menos papel, mais tempo para ensinar</h2>
+        <ul class="benefits-list">
+          <li>
+            <span class="benefit-check">✓</span>
+            <div class="benefit-text">
+              <strong>Feito para a realidade da igreja</strong>
+              <span>Fluxos pensados para coordenadores, professores e quem faz a chamada todo domingo.</span>
+            </div>
+          </li>
+          <li>
+            <span class="benefit-check">✓</span>
+            <div class="benefit-text">
+              <strong>Dados na nuvem, acessíveis de qualquer lugar</strong>
+              <span>API segura em servidor profissional — sua equipe acessa pelo celular quando precisar.</span>
+            </div>
+          </li>
+          <li>
+            <span class="benefit-check">✓</span>
+            <div class="benefit-text">
+              <strong>Relatórios que a liderança entende</strong>
+              <span>Resumo por turma, presença, materiais e oferta reunidos num só lugar.</span>
+            </div>
+          </li>
+          <li>
+            <span class="benefit-check">✓</span>
+            <div class="benefit-text">
+              <strong>Suporte humano quando precisar</strong>
+              <span>Canal direto por WhatsApp para tirar dúvidas e receber orientação.</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="benefits-visual reveal">
+        <div class="benefits-card-stack">
+          <div class="stack-card">
+            <h4>Relatório da aula</h4>
+            <div class="metric">28</div>
+            <div class="metric-label">presentes · 3 visitantes · R$ 145,00 oferta</div>
+          </div>
+          <div class="stack-card" aria-hidden="true"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Público -->
+  <section>
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Para quem é</span>
+        <h2 class="section-title">Cada perfil com a ferramenta certa</h2>
+      </div>
+      <div class="audience-grid">
+        <div class="audience-card reveal">
+          <h3>Coordenador / Administrador</h3>
+          <p>Cadastra a escola, gerencia turmas e pessoas, convida outros administradores e acompanha os resumos gerais.</p>
+        </div>
+        <div class="audience-card reveal">
+          <h3>Professor</h3>
+          <p>Conduz a aula do dia, faz a chamada, registra materiais e entrega o relatório sem complicação.</p>
+        </div>
+        <div class="audience-card reveal">
+          <h3>Liderança da igreja</h3>
+          <p>Acompanha indicadores, frequência, aniversariantes e a saúde da EBD com visão clara e atualizada.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Perguntas frequentes</span>
+        <h2 class="section-title">Tire suas dúvidas</h2>
+        <p style="margin-top:12px;color:var(--muted);">
+          Precisa de um passo a passo completo?
+          <a href="ajuda.html" style="color:var(--primary);font-weight:700;">Abra a central de ajuda →</a>
+        </p>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-question" type="button">
+            O EBD Prime funciona no meu celular?
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="faq-answer"><p>Sim! O aplicativo está disponível para Android e iPhone. Basta instalar, fazer login e começar a usar — a interface foi pensada para telas de celular.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" type="button">
+            Preciso de conhecimento técnico para usar?
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="faq-answer"><p>Não. O dia a dia é feito com botões, listas e formulários simples. O cadastro inicial da escola tem um assistente passo a passo que guia o responsável.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" type="button">
+            Os dados da minha igreja ficam separados de outras?
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="faq-answer"><p>Sim. O sistema é multi-igreja: cada congregação tem seus próprios dados isolados, com acesso controlado por login e senha.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" type="button">
+            E se eu esquecer a senha?
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="faq-answer"><p>No app, use "Esqueci minha senha", confirme o e-mail cadastrado e receba um link para criar uma nova senha com segurança.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" type="button">
+            Como cadastro minha escola?
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="faq-answer"><p>Entre em contato pelo WhatsApp ou use o botão "Cadastrar minha escola" nesta página. Nossa equipe orienta o primeiro acesso e a configuração da sua congregação.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA final -->
+  <section class="cta-section" id="contato">
+    <div class="container">
+      <div class="cta-box reveal">
+        <img src="api/landing-asset.php?f=logo_comprida.png" alt="EBD Prime" width="180" height="45" style="margin:0 auto 24px;filter:brightness(0) invert(1);" />
+        <h2>Pronto para transformar a gestão da sua EBD?</h2>
+        <p>Cadastre sua escola, organize turmas e tenha relatórios claros a cada domingo. Nossa equipe está pronta para ajudar no primeiro passo.</p>
+        <div class="cta-buttons">
+          <a href="https://wa.me/5563991249775?text=Ol%C3%A1%2C%20quero%20cadastrar%20minha%20escola%20no%20EBD%20Prime" class="btn btn-whatsapp" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.532 5.855L0 24l6.336-1.662A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.01-1.37l-.36-.214-3.76.986 1.004-3.66-.234-.375A9.818 9.818 0 1112 21.818z"/></svg>
+            Falar no WhatsApp
+          </a>
+          <a href="mailto:suporte@adparaiso.com.br" class="btn btn-outline">suporte@adparaiso.com.br</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rodapé -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="api/landing-asset.php?f=logo_comprida.png" alt="EBD Prime" width="144" height="36" />
+          <p>Aplicativo para gestão da Escola Bíblica Dominical — turmas, chamada, relatórios e muito mais para sua igreja.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navegação</h4>
+          <ul>
+            <li><a href="#funcionalidades">Funcionalidades</a></li>
+            <li><a href="#como-funciona">Como funciona</a></li>
+            <li><a href="#beneficios">Benefícios</a></li>
+            <li><a href="ajuda.html">Central de ajuda</a></li>
+            <li><a href="#faq">Perguntas frequentes</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contato</h4>
+          <ul>
+            <li><a href="https://wa.me/5563991249775" target="_blank" rel="noopener">WhatsApp</a></li>
+            <li><a href="mailto:suporte@adparaiso.com.br">suporte@adparaiso.com.br</a></li>
+            <li><a href="https://ebd.adparaiso.com.br/api/health.php" target="_blank" rel="noopener">Status do sistema</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 EBD Prime · AD Paraíso</span>
+        <span>ebd.adparaiso.com.br</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var nav = document.getElementById('nav');
+      var menuToggle = document.getElementById('menuToggle');
+      var navLinks = document.getElementById('navLinks');
+
+      function updateNav() {
+        nav.classList.toggle('scrolled', window.scrollY > 24);
+      }
+
+      window.addEventListener('scroll', updateNav, { passive: true });
+      updateNav();
+
+      menuToggle.addEventListener('click', function () {
+        navLinks.classList.toggle('open');
+      });
+
+      navLinks.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+          navLinks.classList.remove('open');
+        });
+      });
+
+      document.querySelectorAll('.faq-question').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var item = btn.closest('.faq-item');
+          var wasOpen = item.classList.contains('open');
+          document.querySelectorAll('.faq-item').forEach(function (el) { el.classList.remove('open'); });
+          if (!wasOpen) item.classList.add('open');
+        });
+      });
+
+      var reveals = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+        reveals.forEach(function (el) { observer.observe(el); });
+      } else {
+        reveals.forEach(function (el) { el.classList.add('visible'); });
+      }
+    })();
+  </script>
+</body>
+</html>
