@@ -17,13 +17,25 @@ Aplicativo mobile e ecossistema web para **gestão completa da Escola Bíblica D
 
 ```
 ebd-prime/
-├── mobile/          # App Expo (Android / iOS)
-├── backend/         # API REST PHP + scripts
-├── landing/         # Site institucional
-├── scripts/         # Deploy FTP e utilitários
-├── docs/            # Documentação e especificação
-└── apresentacao-ifto/  # Slides da apresentação académica
+├── mobile/              # App Expo (Android / iOS)
+├── backend/             # API REST PHP + scripts
+├── landing/             # Site institucional
+├── scripts/             # Deploy FTP e utilitários
+├── docs/                # Documentação (PDF, requisitos, API)
+└── apresentacao-ifto/   # Slides da apresentação académica
 ```
+
+## Documentação
+
+| Documento | Conteúdo |
+|-----------|----------|
+| [docs/DOCUMENTACAO_APP_EBD_PRIME.pdf](docs/DOCUMENTACAO_APP_EBD_PRIME.pdf) | **Documentação completa** (entrega IFTO) |
+| [docs/modelo-logico-dados.jpg](docs/modelo-logico-dados.jpg) | Modelo lógico de dados (ER) |
+| [docs/requisitos.txt](docs/requisitos.txt) | Requisitos RF/RNF/RN e estado do projeto |
+| [docs/api_rest_ebd_prime.md](docs/api_rest_ebd_prime.md) | Endpoints da API REST |
+| [docs/DEPLOY-HOSTINGER-FTP-AUTOMATICO.md](docs/DEPLOY-HOSTINGER-FTP-AUTOMATICO.md) | Deploy para produção |
+
+Índice completo: [docs/README.md](docs/README.md)
 
 ## Começar em desenvolvimento
 
@@ -36,15 +48,12 @@ npm install
 cd mobile && npm install && cd ..
 ```
 
-### 2. Variáveis de ambiente (obrigatório)
+### 2. Variáveis de ambiente
 
 Copie os exemplos — **nunca commite os ficheiros `.env` reais**:
 
 ```bash
-# Backend (API local)
 cp backend/.env.example backend/.env
-
-# App mobile
 cp mobile/.env.example mobile/.env
 ```
 
@@ -52,14 +61,18 @@ Para deploy na Hostinger (opcional, só na sua máquina):
 
 ```bash
 cp backend/.env.deploy.example backend/.env.deploy
-# Edite com as credenciais FTP do hPanel
 ```
 
-### 3. Base de dados local (Docker)
+### 3. Base de dados local (opcional)
+
+Para testar a API no computador, use **MySQL instalado** (XAMPP, Laragon ou MariaDB) ou aponte o `backend/.env` para a base da Hostinger.
 
 ```bash
-npm run db:up
-npm run db:import:docker
+# Com cliente mysql no PATH (ex.: XAMPP)
+npm run db:import
+
+# Ou via PHP
+npm run db:import:php
 npm run db:seed:demo
 ```
 
@@ -69,19 +82,22 @@ npm run db:seed:demo
 # Terminal 1 — API em http://localhost:8080
 npm run api
 
-# Terminal 2 — Expo
+# Terminal 2 — Expo (use a URL da API no mobile/.env)
 cd mobile && npx expo start
 ```
+
+Em desenvolvimento rápido, o app pode apontar directamente para **produção** (`EXPO_PUBLIC_API_URL=https://ebd.adparaiso.com.br`) sem base local.
 
 ## Comandos úteis
 
 | Comando | Descrição |
 |---------|-----------|
 | `npm run api` | Servidor PHP de desenvolvimento |
+| `npm run db:import` | Importa schema SQL (MySQL local) |
 | `npm run db:seed:demo` | Dados fictícios para testes |
 | `npm run deploy:hostinger` | Empacota e envia para Hostinger via FTP |
 | `npm run build:apk` | Build APK Android (EAS) |
-| `node scripts/verify-git-safe.mjs` | Verifica se há segredos antes do `git push` |
+| `npm run verify:git` | Verifica se há segredos antes do `git push` |
 
 ## Segurança — o que NÃO vai para o Git
 
@@ -92,22 +108,12 @@ O `.gitignore` exclui automaticamente:
 - `deploy/` (pacote gerado)
 - `node_modules/`, `backend/vendor/`
 - dumps SQL de produção (`u370088447_*.sql`)
-- chaves, certificados e service accounts
 
-Antes de cada push, execute:
+Antes de cada push:
 
 ```bash
-node scripts/verify-git-safe.mjs
+npm run verify:git
 ```
-
-## Documentação
-
-| Documento | Conteúdo |
-|-----------|----------|
-| [docs/ESTADO_DO_PROJETO.md](docs/ESTADO_DO_PROJETO.md) | Estado actual e backlog |
-| [docs/DOCUMENTO_ESPECIFICACAO_EBD_PRIME.md](docs/DOCUMENTO_ESPECIFICACAO_EBD_PRIME.md) | Especificação do sistema |
-| [docs/DEPLOY-HOSTINGER-FTP-AUTOMATICO.md](docs/DEPLOY-HOSTINGER-FTP-AUTOMATICO.md) | Deploy automático FTP |
-| [docs/api_rest_ebd_prime.md](docs/api_rest_ebd_prime.md) | Endpoints da API REST |
 
 ## Autor
 

@@ -85,9 +85,9 @@ $payload = [
 if ($dbErrorCode !== null) {
     $payload['database']['error_code'] = $dbErrorCode;
     $payload['hints'] = [
-        'Confirme que o MySQL está a correr (Docker: docker compose up -d na raiz; ou XAMPP / Laragon).',
+        'Confirme que o MySQL está a correr (XAMPP, Laragon ou base remota Hostinger).',
         'Verifique o ficheiro backend/.env: EBD_DB_HOST (prefira 127.0.0.1), EBD_DB_USER, EBD_DB_PASS, EBD_DB_NAME.',
-        'Importe o schema: npm run db:import:docker, npm run db:import:php ou backend/scripts/import-schema.ps1.',
+        'Importe o schema: npm run db:import, npm run db:import:php ou backend/scripts/import-schema.ps1.',
     ];
 }
 

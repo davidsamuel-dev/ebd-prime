@@ -1,6 +1,6 @@
 # Migração da base de dados para a Hostinger (MySQL + API PHP)
 
-O EBD Prime suporta **dois backends**. Hoje o app mobile está em **Firebase**; na Hostinger passa a usar **MySQL + API REST (PHP)** — é o desenho descrito em `docs/documentacao_ebd_prime.md` (ex.: `ebd.adparaiso.com.br`).
+O EBD Prime usa **MySQL + API REST (PHP)** em produção na Hostinger (`ebd.adparaiso.com.br`). O app mobile comunica exclusivamente com essa API.
 
 ## O que vai para onde
 

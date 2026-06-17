@@ -18,7 +18,7 @@ try {
     exit(0);
 } catch (Throwable $e) {
     fwrite(STDERR, 'Falha: ' . $e->getMessage() . "\n");
-    fwrite(STDERR, "Arranque o MySQL (XAMPP, Laragon ou `docker compose up -d`) e ajuste backend/.env.\n");
-    fwrite(STDERR, "Importe schema: npm run db:import:docker  ou  npm run db:import\n");
+    fwrite(STDERR, "Arranque o MySQL (XAMPP, Laragon) ou aponte backend/.env para a Hostinger.\n");
+    fwrite(STDERR, "Importe schema: npm run db:import  ou  npm run db:import:php\n");
     exit(1);
 }

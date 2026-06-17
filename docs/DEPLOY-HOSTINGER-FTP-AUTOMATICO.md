@@ -85,5 +85,3 @@ npm run deploy:hostinger
     → FTP upload para HOSTINGER_FTP_REMOTE_DIR
     → API atualizada no servidor
 ```
-
-Guia rápido antigo (upload manual): [DEPLOY-HOSTINGER-AGORA.md](./DEPLOY-HOSTINGER-AGORA.md).

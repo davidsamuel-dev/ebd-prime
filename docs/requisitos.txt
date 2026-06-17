@@ -13,9 +13,8 @@ Este documento consolida o estado REAL do projeto em junho/2026:
 - backlog e itens parciais.
 
 Base de comparacao usada:
-- docs/requisitos_ebd_prime.txt (numeracao oficial RF/RNF/RN)
-- docs/DOCUMENTO_ESPECIFICACAO_EBD_PRIME.md
-- docs/ESTADO_DO_PROJETO.md
+- docs/DOCUMENTACAO_APP_EBD_PRIME.pdf (documentacao completa entregue)
+- docs/modelo-logico-dados.jpg (modelo logico ER)
 - docs/api_rest_ebd_prime.md
 - codigo em mobile/, backend/api/, landing/
 - producao: https://ebd.adparaiso.com.br
@@ -76,7 +75,7 @@ Legenda de status:
 ========================================================================
 3) REQUISITOS FUNCIONAIS (RF001…RF050) — ESTADO ACTUAL
 ========================================================================
-Numeracao alinhada a docs/requisitos_ebd_prime.txt
+Numeracao oficial RF001…RF050 (documentada no PDF e neste ficheiro)
 
 --- 3.1 Autenticacao e sessao ---
 RF001  Autenticacao (login, health check, atalhos)
@@ -524,18 +523,17 @@ Ver lista completa em docs/api_rest_ebd_prime.md e backend/openapi.yaml.
 
 6. RN006 (vencedores por departamento): implementado no endpoint e na UI.
 
-7. Numeracao RF deste ficheiro alinhada a docs/requisitos_ebd_prime.txt
-   (versao anterior usava RF001–RF019 proprios, inconsistentes com o projeto).
+7. Numeracao RF deste ficheiro alinhada ao PDF de documentacao e ao codigo
+   actual do projeto.
 
 ========================================================================
 10) RECOMENDACOES DE GOVERNANCA
 ========================================================================
 1. Manter docs/requisitos.txt como resumo executivo do estado real.
-2. Detalhe tecnico completo: docs/requisitos_ebd_prime.txt (actualizar em
-   sincronia quando RF/RNF mudarem de status).
+2. Documentacao completa para entrega: docs/DOCUMENTACAO_APP_EBD_PRIME.pdf.
 3. Apos cada release em producao:
    - executar npm run verify:git antes do push,
-   - actualizar ESTADO_DO_PROJETO.md e CHANGELOG.md,
+   - actualizar CHANGELOG.md,
    - rever secao 8 (backlog) deste ficheiro.
 4. Nunca commitar: backend/.env, .env.production, .env.deploy, mobile/.env.
 

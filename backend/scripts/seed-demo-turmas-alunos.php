@@ -47,7 +47,7 @@ try {
     $pdo = ebd_get_pdo();
 } catch (Throwable $e) {
     fwrite(STDERR, "Erro MySQL: " . $e->getMessage() . "\n");
-    fwrite(STDERR, "Confirme backend/.env e `npm run db:up` + `npm run db:import:docker`.\n");
+    fwrite(STDERR, "Confirme backend/.env e execute npm run db:import (ou db:import:php).\n");
     exit(1);
 }
 

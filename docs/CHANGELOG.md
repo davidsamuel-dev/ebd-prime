@@ -90,12 +90,21 @@ Funcionalidades já existentes antes desta leva (mantidas): login, onboarding es
 
 ---
 
-## Próximos passos (documentados em `ESTADO_DO_PROJETO.md`)
+## 17/06/2026 — Entrega final (IFTO)
 
-- Painel **Geral** com dados reais agregados (parte ainda mock)
-- Notificações push, PDF, tesouraria completa
-- Site web publicado na raiz do domínio (`DEPLOY-WEB-HOSTINGER.md`)
+- Documentação consolidada em `docs/DOCUMENTACAO_APP_EBD_PRIME.pdf`
+- Modelo lógico de dados em `docs/modelo-logico-dados.jpg`
+- Limpeza de documentos legados e remoção do Docker (dev local via XAMPP/Laragon ou API em produção)
+- `docs/requisitos.txt` como resumo executivo RF/RNF/RN
 
 ---
 
-*Ao implementar novas funcionalidades, acrescentar uma secção datada no topo deste ficheiro e actualizar `ESTADO_DO_PROJETO.md` e a secção 1 de `DOCUMENTO_ESPECIFICACAO_EBD_PRIME.md`.*
+## Próximos passos (ver `docs/requisitos.txt` secção 8)
+
+- Gate Geral quando todas as turmas enviarem (RF042)
+- Notificações push, exportação PDF, tesouraria completa
+- Versão web espelhada do app (RF046)
+
+---
+
+*Ao implementar novas funcionalidades, acrescentar uma secção datada no topo deste ficheiro e actualizar `docs/requisitos.txt`.*

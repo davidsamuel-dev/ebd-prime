@@ -1,6 +1,6 @@
 # API REST — EBD Prime
 
-Anexo técnico da especificação: [`DOCUMENTO_ESPECIFICACAO_EBD_PRIME.md`](./DOCUMENTO_ESPECIFICACAO_EBD_PRIME.md).
+Anexo técnico da documentação: [`DOCUMENTACAO_APP_EBD_PRIME.pdf`](./DOCUMENTACAO_APP_EBD_PRIME.pdf) e [`requisitos.txt`](./requisitos.txt).
 
 Documentação de referência do backend PHP (PDO + MySQL), alinhada com `backend/openapi.yaml` e com a constante `EbdApiMeta::VERSION` em `backend/api/meta.php`.
 
