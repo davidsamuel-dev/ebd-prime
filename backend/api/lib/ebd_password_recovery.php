@@ -98,7 +98,7 @@ SQL;
             's' => $senhaHash,
             'id' => $userId,
         ]);
-        $pdo->prepare('UPDATE recuperacao_senhas SET used_at = NOW() WHERE id = :id')->execute(['id' => $recId]);
+        $pdo->prepare('DELETE FROM recuperacao_senhas WHERE id = :id')->execute(['id' => $recId]);
         $pdo->commit();
     } catch (Throwable $e) {
         $pdo->rollBack();

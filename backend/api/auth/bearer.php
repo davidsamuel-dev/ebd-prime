@@ -35,6 +35,16 @@ function ebd_get_bearer_plain_token(): ?string
  */
 function ebd_issue_api_token(PDO $pdo, int $usuarioId): array
 {
+    if (!function_exists('ebd_purge_expired_api_tokens')) {
+        $maintenance = dirname(__DIR__, 2) . '/lib/ebd_db_maintenance.php';
+        if (is_readable($maintenance)) {
+            require_once $maintenance;
+        }
+    }
+    if (function_exists('ebd_purge_expired_api_tokens')) {
+        ebd_purge_expired_api_tokens($pdo, $usuarioId);
+    }
+
     $plain = bin2hex(random_bytes(32));
     $hash = hash('sha256', $plain);
     $expiresAt = (new DateTimeImmutable('+30 days'))->format('Y-m-d H:i:s');

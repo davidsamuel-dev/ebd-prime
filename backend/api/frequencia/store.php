@@ -40,11 +40,15 @@ $turma = ebd_require_turma_in_scope($pdo, $auth, $turmaId);
 require_once dirname(__DIR__) . '/usuarios/_helpers.php';
 $excludeInativosAluno = ebd_sql_exclude_cadastro_inativo_papel_if_table($pdo, 'u', 'aluno');
 
+ebd_require_lib('ebd_escala_helpers.php');
+
 $relatorioId = 0;
 
 $pdo->beginTransaction();
 
 try {
+    ebd_ensure_escala_aula($pdo, $turmaId, $dataAula);
+
     $findRel = $pdo->prepare(
         'SELECT id FROM relatorios_aula WHERE turma_id = :tid AND data_aula = :d LIMIT 1'
     );

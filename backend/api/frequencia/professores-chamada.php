@@ -36,6 +36,8 @@ require_once dirname(__DIR__) . '/usuarios/_helpers.php';
 
 $excludeInativosProfessor = ebd_sql_exclude_cadastro_inativo_papel_if_table($pdo, 'u', 'professor');
 
+ebd_require_lib('ebd_escala_helpers.php');
+
 
 
 if ($method === 'GET') {
@@ -337,6 +339,8 @@ SQL
 
 
             if (!isset($relCache[$tid])) {
+
+                ebd_ensure_escala_aula($pdo, $tid, $dataAula);
 
                 $findRel->execute(['tid' => $tid, 'd' => $dataAula]);
 

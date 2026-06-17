@@ -1,0 +1,544 @@
+EBD PRIME - REQUISITOS FUNCIONAIS, NAO FUNCIONAIS E REGRAS DE NEGOCIO
+Analise consolidada de documentacao + implementacao real do projeto
+Data da analise: 10/06/2026 (revisao alinhada ao codigo, producao e GitHub)
+
+========================================================================
+1) OBJETIVO DESTE DOCUMENTO
+========================================================================
+Este documento consolida o estado REAL do projeto em junho/2026:
+- funcionalidades implementadas (mobile + backend + site),
+- requisitos funcionais (RF001…RF050),
+- requisitos nao funcionais (RNF001…RNF008),
+- regras de negocio (RN001…RN007),
+- backlog e itens parciais.
+
+Base de comparacao usada:
+- docs/requisitos_ebd_prime.txt (numeracao oficial RF/RNF/RN)
+- docs/DOCUMENTO_ESPECIFICACAO_EBD_PRIME.md
+- docs/ESTADO_DO_PROJETO.md
+- docs/api_rest_ebd_prime.md
+- codigo em mobile/, backend/api/, landing/
+- producao: https://ebd.adparaiso.com.br
+- repositorio: https://github.com/davidsamuel-dev/ebd-prime
+
+Legenda de status:
+  IMPLEMENTADO  — em uso no fluxo normal (local ou producao)
+  PARCIAL       — existe, mas com lacunas ou fallback
+  FUTURO        — planejado, nao entregue
+  OBSOLETO      — existia em versao anterior (ex.: Firebase); nao e o caminho atual
+
+========================================================================
+2) VISAO GERAL DAS FUNCIONALIDADES (IMPLEMENTADAS)
+========================================================================
+2.1 Autenticacao e conta
+- Login e logout com API REST (Bearer token em SecureStore).
+- Health check antes do login (backend/api/health.php).
+- Recuperacao de senha: lookup + e-mail SMTP + pagina web de redefinicao.
+- Gestao de conta: dados, troca de login/senha, exclusao.
+
+2.2 Onboarding da escola
+- Fluxo multi-etapas (cadastro-escola): termos, telefone, SMS, dados pessoais,
+  credenciais e instituicao.
+- Registro de congregacao e primeiro administrador via API REST.
+
+2.3 Navegacao e estrutura do app
+- Expo Router: tabs Inicio/Geral + carrossel Inicio/Turmas/Cadastros.
+- Stack: login, nova aula, sessao, cadastros, historico, configuracoes, etc.
+
+2.4 Turmas e cadastros
+- Turmas: listar, criar, editar (store com turma_id) e remover.
+- Cadastros: CRUD alunos/professores, busca, inativos com reativacao/exclusao
+  (inclusive em lote).
+
+2.5 Aulas, chamada e relatorio
+- Escala de aulas: criar, editar data/numero da licao, remover (long press).
+- Sessao de aula: presenca, biblia/revista, visitantes, oferta, observacoes.
+- Envio de relatorio por turma; frequencia isolada por data/aula.
+
+2.6 Relatorios e dashboards
+- Resumo consolidado da aula (aula-resumo.php + telas aula-resumo).
+- Painel Geral com endpoint real (geral-resumo.php): rankings, indicadores,
+  vencedores por departamento, filtros por periodo.
+- Resumo por turma por intervalo (resumo-intervalo.php).
+- Historico do aluno, aniversariantes do mes, modulo de ausentes.
+
+2.7 Administracao e site
+- Acesso administrativo: listagem e convite de administradores.
+- Dados da escola e configuracao SMTP por congregacao.
+- Site institucional (landing/) em ebd.adparaiso.com.br com central de ajuda.
+- Deploy automatizado para Hostinger via FTP (npm run deploy:hostinger).
+
+2.8 Arquitetura actual (producao)
+- REST-only: PHP 8 + PDO + MySQL na Hostinger.
+- Firebase/Firestore REMOVIDO do codigo mobile actual; nao e backend activo.
+- Multi-igreja na mesma base MySQL com isolamento por congregacao_id.
+
+========================================================================
+3) REQUISITOS FUNCIONAIS (RF001…RF050) — ESTADO ACTUAL
+========================================================================
+Numeracao alinhada a docs/requisitos_ebd_prime.txt
+
+--- 3.1 Autenticacao e sessao ---
+RF001  Autenticacao (login, health check, atalhos)
+       Status: IMPLEMENTADO
+       O utilizador inicia sessao com credenciais validadas pelo servidor.
+       Antes do login, o app confirma que a API esta disponivel. Atalhos de
+       acesso rapido podem ser guardados localmente no dispositivo.
+
+RF002  Recuperacao de senha (UI + fluxo completo)
+       Status: IMPLEMENTADO
+       Ecra dedicado no app para solicitar recuperacao por e-mail, com
+       validacao de identidade e redirecionamento para redefinicao segura
+       da senha.
+
+RF003  Backend REST da recuperacao de senha
+       Status: IMPLEMENTADO
+       API completa: consulta de utilizador, envio de link por SMTP e
+       redefinicao de senha com token de uso unico e prazo de validade.
+
+RF004  Recuperacao via Firebase Auth
+       Status: OBSOLETO
+       Abordagem da versao anterior com Firebase; o fluxo actual e exclusivamente
+       REST com e-mail SMTP.
+
+RF005  Logout
+       Status: IMPLEMENTADO
+       Encerramento de sessao no cliente e revogacao do token no servidor,
+       removendo credenciais guardadas no dispositivo.
+
+RF006  Token de sessao (armazenamento seguro + Bearer)
+       Status: IMPLEMENTADO
+       Token opaco emitido no login, guardado de forma segura no dispositivo
+       e enviado em cada pedido autenticado via cabecalho Authorization.
+
+--- 3.2 Onboarding nova escola ---
+RF007  Fluxo guiado de cadastro de escola
+       Status: IMPLEMENTADO
+       Assistente multi-etapas: termos de uso, telefone, dados pessoais,
+       credenciais e dados da instituicao, culminando no registo da
+       congregacao e do primeiro administrador.
+
+RF008  Validacao SMS no onboarding
+       Status: PARCIAL
+       Codigo de verificacao por SMS integrado no fluxo; o gateway SMS externo
+       real permanece opcional ou dependente de configuracao.
+
+RF009  Registo Firebase no onboarding
+       Status: OBSOLETO
+       Substituído pelo registo via API REST na base MySQL centralizada.
+
+--- 3.3 Navegacao ---
+RF010  Tabs e carrossel principal
+       Status: IMPLEMENTADO
+       Navegacao por abas (Inicio e Geral) e carrossel horizontal entre
+       Inicio, Turmas e Cadastros na area principal do app.
+
+RF011  Menu drawer no Portal Geral
+       Status: IMPLEMENTADO
+       Menu lateral no painel geral com opcoes de partilha, termos de uso
+       e saida da aplicacao.
+
+RF012  Stack global de rotas
+       Status: IMPLEMENTADO
+       Navegacao em pilha para ecras auxiliares: login, nova aula, sessao
+       de aula, cadastros, historico, configuracoes e modulos administrativos.
+
+--- 3.4 Inicio (portal) ---
+RF013  Saudacao dinamica e identidade no header
+       Status: IMPLEMENTADO
+       Cabecalho personalizado com saudacao conforme horario do dia e
+       identificacao visual da escola/congregacao.
+
+RF014  Checklist "comece por aqui" (4 passos)
+       Status: IMPLEMENTADO
+       Guia inicial com quatro passos para orientar o administrador na
+       configuracao da escola (turmas, cadastros, escala e primeira aula).
+
+RF015  Escala de aulas (listar, editar, remover)
+       Status: IMPLEMENTADO
+       Listagem das aulas agendadas no portal inicial, com edicao de data
+       e numero da licao e remocao por gesto prolongado (long press).
+
+RF016  Videos tutoriais no Inicio
+       Status: PARCIAL
+       Secao de tutoriais presente com conteudo estatico/placeholder;
+       videos reais estao previstos em RF049.
+
+RF017  Persistencia do onboarding visual concluido
+       Status: IMPLEMENTADO
+       Estado do checklist inicial guardado localmente para nao repetir
+       o guia apos conclusao pelo utilizador.
+
+--- 3.5 Turmas ---
+RF018  Listagem de turmas por congregacao
+       Status: IMPLEMENTADO
+       Lista todas as turmas da igreja autenticada, com contagem de alunos
+       e informacoes de departamento.
+
+RF019  Criar turma
+       Status: IMPLEMENTADO
+       Formulario para criar nova turma com nome, departamento e faixa
+       etaria, associada automaticamente a congregacao do utilizador.
+
+RF020  Departamento / faixa etaria na turma
+       Status: IMPLEMENTADO
+       Cada turma pode ser classificada por departamento (ex.: adultos,
+       jovens, criancas) e faixa etaria no momento da criacao ou edicao.
+
+       Nota: edicao e remocao de turmas tambem estao implementadas no mesmo
+       modulo de gestao de turmas.
+
+--- 3.6 Cadastros (pessoas) ---
+RF021  Lista com pesquisa
+       Status: IMPLEMENTADO
+       Listagem de alunos e professores com campo de pesquisa por nome,
+       filtrada pela congregacao autenticada.
+
+RF022  Criar/editar aluno ou professor
+       Status: IMPLEMENTADO
+       Formulario completo para cadastro e actualizacao de dados pessoais,
+       vinculo a turmas e papel (aluno ou professor).
+
+RF023  Inativar vinculo / papel na turma
+       Status: IMPLEMENTADO
+       Permite desactivar o vinculo de um cadastro a uma turma sem apagar
+       o historico, preservando dados para consulta futura.
+
+RF024  Cadastros inativos (reativar, excluir, lote)
+       Status: IMPLEMENTADO
+       Ecra dedicado para gerir cadastros inactivos, com reativacao
+       individual, exclusao definitiva e operacoes em lote.
+
+--- 3.7 Aulas e chamada ---
+RF025  Inserir aula na escala
+       Status: IMPLEMENTADO
+       Agendamento de nova data de aula na escala, associada a turma e
+       opcionalmente ao professor responsavel.
+
+RF026  Sessao de aula (chamada + contadores + oferta)
+       Status: IMPLEMENTADO
+       Ecra de sessao com chamada de presenca dos alunos, contagem de
+       biblias e revistas, visitantes, valor de oferta e observacoes,
+       com envio ou guardar como rascunho.
+
+RF027  Desbloqueio do Painel Geral apos primeiro relatorio
+       Status: IMPLEMENTADO
+       O painel geral de rankings permanece bloqueado ate existir pelo
+       menos um relatorio enviado na congregacao.
+
+--- 3.8 Resumo por turma ---
+RF028  Ecra resumo-turma com intervalos fixos
+       Status: IMPLEMENTADO
+       Resumo estatistico por turma com intervalos predefinidos (semana,
+       mes, trimestre, etc.) calculados no servidor.
+
+RF029  Intervalo personalizado no resumo
+       Status: PARCIAL
+       Opcao de intervalo customizado existe na interface, mas pode recorrer
+       a dados simulados quando o periodo nao e suportado pelo backend.
+
+--- 3.9 Historico e aniversariantes ---
+RF030  Historico individual do aluno
+       Status: IMPLEMENTADO
+       Consulta do historico de presencas, pontuacao e participacao de
+       um aluno ao longo do tempo.
+
+RF031  Aniversariantes do mes
+       Status: IMPLEMENTADO
+       Listagem dos cadastros com aniversario no mes corrente, para
+       facilitar felicitacoes e acompanhamento pastoral.
+
+--- 3.10 Painel Geral ---
+RF032  Estado vazio ate haver dados
+       Status: IMPLEMENTADO
+       O painel geral exibe mensagem orientativa enquanto nao existirem
+       relatorios suficientes para gerar rankings.
+
+RF033  Dashboard com filtros e rankings
+       Status: IMPLEMENTADO
+       Painel consolidado com filtros por periodo, rankings de frequencia
+       e pontuacao, e indicadores agregados da escola.
+
+RF034  Dados agregados reais no Geral (sem mock permanente)
+       Status: IMPLEMENTADO
+       Todos os indicadores do painel geral sao calculados a partir dos
+       relatorios e frequencias reais na base de dados.
+       Nota: documentos antigos marcavam [MOCK]; estado actual corrigido.
+
+--- 3.11 Configuracoes e UI transversal ---
+RF035  Ecra de configuracoes (partilhar, termos, sair)
+       Status: IMPLEMENTADO
+       Area de configuracoes com partilha do app, consulta de termos de
+       uso e opcao de terminar sessao.
+
+RF036  Opcoes avancadas de configuracao
+       Status: PARCIAL
+       Algumas opcoes avancadas ainda exibem aviso "Em breve" e nao estao
+       totalmente activas.
+
+RF037  Tema e paleta visual (#0078D4, navy, success)
+       Status: IMPLEMENTADO
+       Identidade visual consistente com azul primario, navy e verde de
+       sucesso; suporte a tema claro e escuro.
+
+RF038  Adaptacao ao teclado em formularios
+       Status: IMPLEMENTADO
+       Formularios ajustam o layout quando o teclado virtual esta aberto,
+       evitando que campos fiquem ocultos.
+
+RF039  Componentes de navegacao e hints
+       Status: IMPLEMENTADO
+       Barra de tabs, cabecalho do portal e cartoes de dica contextual
+       reutilizados em todo o app para orientar o utilizador.
+
+--- 3.12 Modulos adicionais implementados (sem RF proprio legado) ---
+- Modulo de ausentes: listagem de alunos com faltas recorrentes ou ausencia
+  prolongada, para acompanhamento pastoral.
+- Resumo da aula finalizada: visao consolidada apos envio de todos os
+  relatorios de um domingo, com totais por turma e indicadores do dia.
+- Dados da escola e SMTP: gestao dos dados institucionais e configuracao
+  do servidor de e-mail para recuperacao de senha e convites.
+- Acesso administrativo: convite e listagem de administradores adicionais
+  da congregacao.
+- Site institucional: pagina publica no dominio de producao com central
+  de ajuda e informacoes sobre o produto.
+
+--- 3.13 Backlog funcional (RF040…RF050) ---
+RF040  Cloud Function / regras Firestore endurecidas
+       Status: OBSOLETO
+       Requisito da arquitectura Firebase; a stack actual e REST-only
+       com validacao no servidor PHP.
+
+RF041  Endpoint agregado do Painel Geral
+       Status: IMPLEMENTADO
+       Servico REST que agrega rankings, vencedores e indicadores para
+       o painel geral — entregue na pratica (ver tambem RF033/RF034).
+
+RF042  Gate Geral apenas quando TODAS as turmas enviarem
+       Status: FUTURO / PARCIAL
+       Regra desejada: desbloquear rankings apenas quando todas as turmas
+       tiverem enviado relatorio no periodo; actualmente basta o primeiro
+       relatorio (RF027).
+
+RF043  Notificacoes push
+       Status: FUTURO
+       Alertas no dispositivo para aniversariantes, lembretes de aula e
+       avisos administrativos.
+
+RF044  Exportacao PDF / partilha estruturada
+       Status: FUTURO
+       Geracao e partilha de relatorios em PDF a partir do app ou do site.
+
+RF045  Tesouraria completa (alem da oferta na aula)
+       Status: FUTURO
+       Modulo financeiro alargado para alem do registo de oferta por aula.
+
+RF046  Versao web espelhada do app no dominio
+       Status: FUTURO
+       Versao web publica com as mesmas funcionalidades do app mobile;
+       Expo web existe em desenvolvimento mas nao esta publicada.
+
+RF047  JWT / sessao formal documentada ponta a ponta
+       Status: PARCIAL
+       Autenticacao Bearer implementada e funcional; documentacao OpenAPI
+       e especificacao formal da sessao ainda a expandir.
+
+RF048  Testes automatizados (e2e / API)
+       Status: FUTURO
+       Suite de testes de ponta a ponta e testes de integracao da API.
+
+RF049  Videos tutoriais reais no Inicio
+       Status: FUTURO
+       Substituir placeholders de RF016 por videos gravados e alojados.
+
+RF050  Internacionalizacao (i18n)
+       Status: FUTURO
+       Suporte a multiplos idiomas na interface do app e do site.
+
+========================================================================
+4) REQUISITOS NAO FUNCIONAIS (RNF001…RNF008) — ESTADO ACTUAL
+========================================================================
+Alinhado a apresentacao IFTO e producao real.
+
+RNF001  App mobile React Native (Expo) + TypeScript; build Android/iOS
+        Status: IMPLEMENTADO
+        Aplicacao mobile multiplataforma com Expo SDK 54, React Native 0.81,
+        React 19 e navegacao por ficheiros (Expo Router 6).
+
+RNF002  Backend centralizado PHP (PDO) servindo app e site
+        Status: IMPLEMENTADO
+        API REST em PHP com PDO/MySQL, servindo tanto o app mobile como
+        o site institucional no mesmo deploy.
+
+RNF003  Base MySQL unificada com sincronizacao imediata entre dispositivos
+        Status: IMPLEMENTADO
+        Dados centralizados em base relacional MySQL; alteracoes feitas
+        por qualquer dispositivo ficam disponiveis imediatamente via API.
+
+RNF004  Deploy em subdominio profissional
+        Status: IMPLEMENTADO
+        Aplicacao e site publicados em ebd.adparaiso.com.br com deploy
+        automatizado para a Hostinger via FTP/FTPS.
+
+RNF005  Interface de chamada rapida (poucos toques)
+        Status: IMPLEMENTADO
+        Sessao de aula optimizada para marcar presenca com um toque e
+        actualizar contadores (biblia, revista) com minima friccao.
+
+RNF006  Comunicacao HTTPS com certificado SSL
+        Status: IMPLEMENTADO
+        Toda a comunicacao entre app e servidor ocorre por HTTPS com
+        certificado SSL valido em producao.
+
+RNF007  Escalabilidade multi-igreja (congregacao_id)
+        Status: IMPLEMENTADO
+        Varias congregacoes partilham a mesma base de dados com isolamento
+        logico por identificador de congregacao em todas as consultas.
+
+RNF008  UX adaptativa ao teclado
+        Status: IMPLEMENTADO
+        Ecras de login, cadastros, recuperacao de senha e onboarding
+        ajustam o layout quando o teclado virtual esta activo.
+
+========================================================================
+5) REGRAS DE NEGOCIO (RN001…RN007) — ESTADO ACTUAL
+========================================================================
+RN001  Isolamento por congregacao (multi-tenant)
+       Status: IMPLEMENTADO
+       Cada escola acede apenas aos seus proprios dados; o servidor filtra
+       todas as operacoes pelo identificador da congregacao autenticada.
+
+RN002  Unificacao da logica no cliente REST
+       Status: IMPLEMENTADO
+       O app mobile comunica exclusivamente com a API REST; nao ha camada
+       Firebase activa nem sincronizacao paralela.
+
+RN003  Rankings por frequencia e pontuacao no Painel Geral
+       Status: IMPLEMENTADO
+       Rankings calculados a partir das presencas e pontuacoes registadas
+       nas sessoes de aula, exibidos no painel geral com dados reais.
+
+RN004  Controle hierarquico por papeis (admin, professor, secretario)
+       Status: PARCIAL
+       Niveis de acesso existem e restringem algumas accoes, mas regras
+       finas por campo ou filial ainda nao estao totalmente definidas.
+
+RN005  Fechamento consolidado condicionado a todas as turmas
+       Status: PARCIAL
+       Regra desejada: consolidar o dia apenas quando todas as turmas
+       enviarem relatorio; actualmente o painel geral desbloqueia apos
+       o primeiro relatorio (ver RF027 e RF042).
+
+RN006  Turmas vencedoras por departamento no Geral
+       Status: IMPLEMENTADO
+       O painel geral destaca a turma vencedora de cada departamento
+       com base nos indicadores agregados do periodo seleccionado.
+
+RN007  Papeis duplos (aluno + professor) e conflito de horario
+       Status: FUTURO
+       Deteccao e tratamento de cadastros com papel duplo e conflitos de
+       horario entre turmas ainda nao implementados.
+
+========================================================================
+6) STACK TECNICA E INFRAESTRUTURA (RESUMO PARA APRESENTACAO)
+========================================================================
+Frontend mobile:
+  TypeScript, React Native, Expo SDK 54, Expo Router, SecureStore, AsyncStorage
+
+Backend:
+  PHP 8, PDO, Composer (PHPMailer), API REST JSON, OpenAPI (backend/openapi.yaml)
+
+Dados:
+  MySQL 8, migrations SQL em backend/database_migration_*.sql
+
+Producao:
+  Hostinger (hospedagem + MySQL + SMTP smtp.hostinger.com)
+  Deploy: Node.js + basic-ftp (scripts/deploy-hostinger.mjs)
+  Site: landing/ na raiz; API em /api/
+
+Controle de versao:
+  Git — https://github.com/davidsamuel-dev/ebd-prime
+
+Identidade visual:
+  Primary #0078D4 | Navy #0C1527 | Success #10B981
+
+========================================================================
+7) API REST — ENDPOINTS PRINCIPAIS (PRODUCAO)
+========================================================================
+Ver lista completa em docs/api_rest_ebd_prime.md e backend/openapi.yaml.
+
+  GET   /api/health.php
+  POST  /api/auth/login.php | logout.php
+  POST  /api/auth/forgot-lookup.php | forgot-send.php | reset-password.php
+  GET   /api/auth/reset-form.php
+  POST  /api/onboarding/sms-request.php | sms-verify.php | register.php
+  GET   /api/usuarios/list.php | historico.php | aniversariantes.php
+        | ausentes-list.php | inativos-list.php
+  POST  /api/usuarios/store.php | inativar.php | ativar.php | delete-cadastro.php
+  GET   /api/turmas/list.php | resumo-intervalo.php
+  POST  /api/turmas/store.php | DELETE turmas/delete.php
+  GET   /api/escala/list.php
+  POST  /api/escala/store.php | update.php | delete.php
+  GET   /api/frequencia/get.php | professores-chamada.php
+  POST  /api/frequencia/store.php
+  GET   /api/relatorios/get.php | aula-resumo.php | geral-resumo.php
+  POST  /api/relatorios/store.php
+  GET   /api/congregacao/get.php | smtp-get.php
+  POST  /api/congregacao/update.php | smtp-update.php
+  GET   /api/conta/get.php
+  POST  /api/conta/update-nome.php | update-login.php | update-password.php
+  POST  /api/administradores/invite.php
+  GET   /api/administradores/list.php
+
+========================================================================
+8) BACKLOG PRIORITARIO (NAO IMPLEMENTADO OU PARCIAL)
+========================================================================
+1. RF042 — Geral so quando todas as turmas enviarem relatorio no periodo.
+2. RF043 — Notificacoes push (aniversariantes, avisos admin).
+3. RF044 — Exportacao PDF de relatorios.
+4. RF045 — Tesouraria completa alem da oferta por aula.
+5. RF046 — App web espelhado publicado no dominio.
+6. RF048 — Testes automatizados (e2e + cobertura API).
+7. RF049 — Videos tutoriais reais (substituir RF016).
+8. RF029 — Intervalo personalizado completo no resumo de turma.
+9. RF008 — SMS real robusto no onboarding (gateway externo).
+10. RN004 / RN007 — Hierarquia e papeis duplos com regras fechadas.
+
+========================================================================
+9) DIVERGENCIAS CORRIGIDAS NESTA REVISAO
+========================================================================
+1. Painel Geral: antes documentado como mock; agora IMPLEMENTADO com
+   geral-resumo.php e consumo real no app (RF033, RF034, RF041).
+
+2. Firebase: documentacao antiga citava dual REST+Firebase; o mobile actual
+   e REST-only (backend-config.ts). RF004, RF009, RF040 = OBSOLETO.
+
+3. RNF004 e RNF006: deploy e HTTPS estao em producao (ebd.adparaiso.com.br),
+   nao sao mais FUTURO.
+
+4. Repositorio Git: URL correcta e github.com/davidsamuel-dev/ebd-prime
+   (nao ebd-madureira).
+
+5. Site institucional: landing/ publicada com deploy Hostinger (nao apenas
+   planejado).
+
+6. RN006 (vencedores por departamento): implementado no endpoint e na UI.
+
+7. Numeracao RF deste ficheiro alinhada a docs/requisitos_ebd_prime.txt
+   (versao anterior usava RF001–RF019 proprios, inconsistentes com o projeto).
+
+========================================================================
+10) RECOMENDACOES DE GOVERNANCA
+========================================================================
+1. Manter docs/requisitos.txt como resumo executivo do estado real.
+2. Detalhe tecnico completo: docs/requisitos_ebd_prime.txt (actualizar em
+   sincronia quando RF/RNF mudarem de status).
+3. Apos cada release em producao:
+   - executar npm run verify:git antes do push,
+   - actualizar ESTADO_DO_PROJETO.md e CHANGELOG.md,
+   - rever secao 8 (backlog) deste ficheiro.
+4. Nunca commitar: backend/.env, .env.production, .env.deploy, mobile/.env.
+
+========================================================================
+FIM
+========================================================================

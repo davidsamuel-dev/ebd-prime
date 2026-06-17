@@ -67,6 +67,9 @@ if ($chk->fetch() === false) {
     $professorUsuarioId = null;
 }
 
+ebd_require_lib('ebd_escala_helpers.php');
+ebd_ensure_escala_aula($pdo, $turmaId, $dataAula, $professorUsuarioId);
+
 $sql = <<<'SQL'
 INSERT INTO relatorios_aula (
     turma_id, professor_usuario_id, data_aula, tema_licao,
